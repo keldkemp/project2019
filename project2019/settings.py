@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+from django.urls import reverse_lazy
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -38,6 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'CRM.apps.CrmConfig',
+    'bootstrap4',
+    'bootstrap_datepicker_plus',
+    'django_filters',
+    'rules.apps.AutodiscoverRulesConfig',
 ]
 
 MIDDLEWARE = [
@@ -122,3 +127,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+LOGIN_URL = reverse_lazy('accounts:login')
+LOGIN_REDIRECT_URL = reverse_lazy('accounts:login-redirect')
+LOGOUT_REDIRECT_URL = reverse_lazy('accounts:login')
