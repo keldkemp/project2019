@@ -14,5 +14,11 @@ class CrmLoginRedirectView(RedirectView):
             return reverse('accounts:login')
         elif self.request.user.is_superuser:
             return reverse('admin:index')
+        elif self.request.user.is_admin:
+            return reverse('accounts:login')
+        elif self.request.user.is_manager:
+            return reverse('accounts:login')
+        elif self.request.user.is_worker:
+            return reverse('accounts:login')
         else:
             return reverse('accounts:login')
