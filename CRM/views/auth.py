@@ -19,7 +19,7 @@ class CrmLoginRedirectView(RedirectView):
             self.request.user.get_update_first_user_login()
             return reverse('accounts:password-change')
         elif self.request.user.is_admin or self.request.user.is_manager or self.request.user.is_worker:
-                return reverse('accounts:profile')
+            return reverse('accounts:profile')
         else:
             return reverse('accounts:login')
 
