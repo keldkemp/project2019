@@ -14,6 +14,12 @@ auth_urlpatterns = ([
         auth.CrmLoginRedirectView.as_view(),
         name='login-redirect'
     ),
+    path(
+            'password-change/',
+            auth.PasswordChangeView.as_view(),
+            name='password-change'
+        ),
+    path('profile/', auth.ProfileView.as_view(), name='profile'),
 ], 'accounts')
 
 urlpatterns = [

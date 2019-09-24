@@ -31,6 +31,7 @@ class Worker(AbstractUser):
     is_admin_user = models.BooleanField('Администратор', default=0)
     is_manager_user = models.BooleanField('Менеджер', default=0)
     is_worker_user = models.BooleanField('Работник', default=0)
+    is_first_login = models.BooleanField('Первый вход в систему', default=0)
     status = models.ForeignKey(Status, on_delete=models.PROTECT, verbose_name='Статус работника', null=True)
     qualifiacation = models.ForeignKey(Qualifiacation, on_delete=models.PROTECT, verbose_name='Квалификация', null=True)
 
@@ -48,6 +49,10 @@ class Worker(AbstractUser):
     def is_worker(self) -> bool:
         if self.is_worker_user:
             return True
+
+    def get_update_first_user_login(self):
+        self.is_first_login = True
+        self.save()
 
 
 class Salary(models.Model):
