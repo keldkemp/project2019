@@ -18,10 +18,15 @@ def is_worker(user) -> bool:
     return user.is_worker
 
 
-is_logged_admin = rules.is_authenticated & is_admin
-is_logged_manager = rules.is_authenticated & is_manager
-is_logged_worker = rules.is_authenticated & is_worker
-is_logged_personnel = rules.is_authenticated & (is_admin | is_manager | is_worker)
+@rules.predicate
+def is_first_login(user) -> bool:
+    return user.is_first_login
+
+
+is_logged_admin = rules.is_authenticated & is_admin & is_first_login
+is_logged_manager = rules.is_authenticated & is_manager & is_first_login
+is_logged_worker = rules.is_authenticated & is_worker & is_first_login
+is_logged_personnel = rules.is_authenticated & (is_admin | is_manager | is_worker) & is_first_login
 
 # Generic permission, can be used, until detailed are needed
 

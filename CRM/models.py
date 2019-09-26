@@ -51,8 +51,9 @@ class Worker(AbstractUser):
             return True
 
     def get_update_first_user_login(self):
-        self.is_first_login = True
-        self.save()
+        if not self.is_first_login:
+            self.is_first_login = True
+            self.save()
 
 
 class Salary(models.Model):

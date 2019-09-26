@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import PasswordChangeView
+from django.contrib.auth.views import PasswordChangeView, PasswordContextMixin
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
     RedirectView, TemplateView, UpdateView,
@@ -16,17 +16,32 @@ class CrmLoginRedirectView(RedirectView):
         elif self.request.user.is_superuser:
             return reverse('admin:index')
         elif not self.request.user.is_first_login:
-            self.request.user.get_update_first_user_login()
-            return reverse('accounts:password-change')
+            return reverse('accounts:password-change-first')
         elif self.request.user.is_admin or self.request.user.is_manager or self.request.user.is_worker:
             return reverse('accounts:profile')
         else:
             return reverse('accounts:login')
 
 
+class PasswordChangeFirsView(LoginRequiredMixin, PasswordChangeView):
+    success_url = reverse_lazy('accounts:password-change-done')
+    template_name = 'CRM/auth/password-change.html'
+
+
 class PasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     success_url = reverse_lazy('accounts:profile')
     template_name = 'CRM/auth/password-change.html'
+
+
+class PasswordChangeDoneView(PasswordContextMixin, TemplateView):
+    success_url = reverse_lazy('accounts:profile')
+    template_name = 'CRM/auth/password_change_done.html'
+    title = 'Password change successful'
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        self.request.user.get_update_first_user_login()
+        return self.render_to_response(context)
 
 
 class ProfileView(PermissionRequiredMixin, UpdateView):
