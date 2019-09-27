@@ -23,7 +23,7 @@ auth_urlpatterns = ([
 ], 'accounts')
 
 users_urlpatterns = ([
-    path('list', users.ShowUsers.as_view(), name='list')
+    path('', users.ShowUsers.as_view(), name='list')
 
 ], 'users')
 
