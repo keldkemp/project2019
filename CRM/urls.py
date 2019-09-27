@@ -1,7 +1,6 @@
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-from CRM.views import managers
-from CRM.views import auth
+from CRM.views import auth, users
 
 
 
@@ -23,14 +22,14 @@ auth_urlpatterns = ([
     path('profile/', auth.ProfileView.as_view(), name='profile'),
 ], 'accounts')
 
-manager_urlpatterns = ([
-    path('managers/', managers.ShowManagers.as_view(), name='managers')
+users_urlpatterns = ([
+    path('list', users.ShowUsers.as_view(), name='list')
 
 ], 'users')
 
 urlpatterns = [
     path('', auth.CrmLoginRedirectView.as_view()),
     path('accounts/', include(auth_urlpatterns)),
-    path('users/', include(manager_urlpatterns)),
+    path('users/', include(users_urlpatterns)),
 ]
 
