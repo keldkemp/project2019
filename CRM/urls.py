@@ -22,6 +22,8 @@ auth_urlpatterns = ([
     path('password-change-first/', auth.PasswordChangeFirsView.as_view(), name='password-change-first'),
     path('password-change-done/', auth.PasswordChangeDoneView.as_view(), name='password-change-done'),
     path('profile/', auth.ProfileView.as_view(), name='profile'),
+    path('user/', auth.CreateUser.as_view(), name='user'),
+    path('password-see/', auth.PasswordSee.as_view(), name='password-see'),
 ], 'accounts')
 
 urlpatterns = [

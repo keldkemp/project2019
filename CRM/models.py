@@ -55,6 +55,27 @@ class Worker(AbstractUser):
             self.is_first_login = True
             self.save()
 
+    def generate_username(self, first_name: str, last_name: str, patronymic: str) -> str:
+        first_name = first_name[0]
+        patronymic = patronymic[0]
+
+        trans_f = translit(first_name, language_code='ru', reversed=True)
+        trans_l = translit(last_name, language_code='ru', reversed=True)
+        trans_p = translit(patronymic, language_code='ru', reversed=True)
+
+        if trans_l.find("'"):
+            trans_l = trans_l.replace("'", '')
+
+        name = f'{trans_l}.{trans_f}{trans_p}'.lower()
+
+        if not Worker.objects.filter(username=name).exists():
+            return name
+
+        for idx in range(2, 100, 1):
+            name_change = ''.join([name, str(idx)])
+            if not Worker.objects.filter(username=name_change).exists():
+                return ''.join([name, str(idx)])
+
 
 class Salary(models.Model):
     worker = models.ForeignKey(Worker, on_delete=models.PROTECT, verbose_name='Работник')
