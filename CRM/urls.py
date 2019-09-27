@@ -3,7 +3,6 @@ from django.contrib.auth import views as auth_views
 from CRM.views import auth, users
 
 
-
 auth_urlpatterns = ([
     path('', auth.CrmLoginRedirectView.as_view()),
     path('login/', auth_views.LoginView.as_view(template_name='CRM/auth/login.html'),
@@ -22,12 +21,12 @@ auth_urlpatterns = ([
     path('password-change-first/', auth.PasswordChangeFirsView.as_view(), name='password-change-first'),
     path('password-change-done/', auth.PasswordChangeDoneView.as_view(), name='password-change-done'),
     path('profile/', auth.ProfileView.as_view(), name='profile'),
-    path('user/', auth.CreateUser.as_view(), name='user'),
-    path('password-see/', auth.PasswordSee.as_view(), name='password-see'),
 ], 'accounts')
 
 users_urlpatterns = ([
-    path('', users.ShowUsers.as_view(), name='list')
+    path('', users.ShowUsers.as_view(), name='list'),
+    path('add/', users.CreateUser.as_view(), name='add'),
+    path('add/password-see/', users.PasswordSee.as_view(), name='password-see'),
 
 ], 'users')
 

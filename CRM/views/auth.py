@@ -46,48 +46,6 @@ class PasswordChangeDoneView(PasswordContextMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class CreateUser(PermissionRequiredMixin, FormView):
-    model = Worker
-    success_url = reverse_lazy('accounts:password-see')
-    form_class = UserForm
-    template_name = 'CRM/user/form.html'
-    permission_required = 'add_user'
-
-    def post(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        username = self.request.user.generate_username(request.POST['first_name'],
-                                                       request.POST['last_name'], request.POST['patronymic'])
-        password = Worker.objects.make_random_password()
-        if self.request.user.is_admin:
-            user = Worker.objects.create_user(username=username, password=password, is_manager_user=True,
-                                              status_id=request.POST['status'],
-                                              qualifiacation_id=request.POST['qualifiacation'],
-                                              first_name=request.POST['first_name'],
-                                              last_name=request.POST['last_name'],
-                                              patronymic=request.POST['patronymic'])
-        elif not self.request.user.is_manager:
-            user = Worker.objects.create_user(username=username, password=password, is_worker_user=True,
-                                              status_id=request.POST['status'],
-                                              qualifiacation_id=request.POST['qualifiacation'],
-                                              first_name=request.POST['first_name'],
-                                              last_name=request.POST['last_name'],
-                                              patronymic=request.POST['patronymic']
-                                              )
-        user.save()
-        return render(request, 'CRM/user/password.html', context={'password': password})
-
-
-class PasswordSee(PermissionRequiredMixin, TemplateView):
-    success_url = reverse_lazy('accounts:profile')
-    template_name = 'CRM/user/password.html'
-    title = 'Password See'
-    permission_required = 'add_user'
-
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        return self.render_to_response(context)
-
-
 class ProfileView(PermissionRequiredMixin, UpdateView):
     template_name = 'CRM/auth/profile.html'
     success_url = reverse_lazy('accounts:profile')

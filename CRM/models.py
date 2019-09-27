@@ -39,16 +39,19 @@ class Worker(AbstractUser):
     def is_admin(self) -> bool:
         if self.is_admin_user:
             return True
+        return False
 
     @property
     def is_manager(self) -> bool:
         if self.is_manager_user:
             return True
+        return False
 
     @property
     def is_worker(self) -> bool:
         if self.is_worker_user:
             return True
+        return False
 
     def get_update_first_user_login(self):
         if not self.is_first_login:
