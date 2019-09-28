@@ -1,0 +1,25 @@
+{% extends "CRM/bars/base.html" %}
+
+{% load bootstrap4 %}
+
+{% block extrahead %}
+{{ form.media }}
+<script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/jquery.inputmask.bundle.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid mt-4 ml-2">
+    <legend class="border-bottom mb-2">Пользователь</legend>
+    <div id="alert" class="alert alert-danger" style="display: none" role="alert"></div>
+    <div class="w-25">
+        <form method="POST">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <div class="form-group">
+                <button class="btn btn-success">Добавить</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

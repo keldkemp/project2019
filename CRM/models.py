@@ -39,21 +39,45 @@ class Worker(AbstractUser):
     def is_admin(self) -> bool:
         if self.is_admin_user:
             return True
+        return False
 
     @property
     def is_manager(self) -> bool:
         if self.is_manager_user:
             return True
+        return False
 
     @property
     def is_worker(self) -> bool:
         if self.is_worker_user:
             return True
+        return False
 
     def get_update_first_user_login(self):
         if not self.is_first_login:
             self.is_first_login = True
             self.save()
+
+    def generate_username(self, first_name: str, last_name: str, patronymic: str) -> str:
+        first_name = first_name[0]
+        patronymic = patronymic[0]
+
+        trans_f = translit(first_name, language_code='ru', reversed=True)
+        trans_l = translit(last_name, language_code='ru', reversed=True)
+        trans_p = translit(patronymic, language_code='ru', reversed=True)
+
+        if trans_l.find("'"):
+            trans_l = trans_l.replace("'", '')
+
+        name = f'{trans_l}.{trans_f}{trans_p}'.lower()
+
+        if not Worker.objects.filter(username=name).exists():
+            return name
+
+        for idx in range(2, 100, 1):
+            name_change = ''.join([name, str(idx)])
+            if not Worker.objects.filter(username=name_change).exists():
+                return ''.join([name, str(idx)])
 
 
 class Salary(models.Model):

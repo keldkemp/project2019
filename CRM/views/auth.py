@@ -1,11 +1,13 @@
+from django.shortcuts import render
+from CRM.models import Worker
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import PasswordChangeView, PasswordContextMixin
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
-    RedirectView, TemplateView, UpdateView,
+    RedirectView, TemplateView, UpdateView, CreateView, FormView
 )
 from rules.contrib.views import PermissionRequiredMixin
-from CRM.forms import ProfileAdminForm
+from CRM.forms import ProfileAdminForm, UserForm
 
 
 class CrmLoginRedirectView(RedirectView):
