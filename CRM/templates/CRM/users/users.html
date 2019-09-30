@@ -25,6 +25,7 @@
        <table  border="1">
            <tr><td width="300"><b>ФИО</b></td>
           <td width="300"><b>Должность</b></td>
+               <td width="300"><b>Статус</b></td>
         </tr>
         {%for user in users%}
 
@@ -33,6 +34,7 @@
         <tr>
           <td> <div> {{ user.first_name }} {{ user.last_name }} {{ user.patronymic }}</div></td>
          <td>{{ user.qualifiacation }}</td>
+            <td>{{ user.status }}</td>
         </tr>
 
   {%endfor%}
