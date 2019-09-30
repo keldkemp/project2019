@@ -1,0 +1,23 @@
+[
+  {
+    "model": "CRM.Status",
+    "pk": 1,
+    "fields": {
+      "name_status": "В сети"
+    }
+  },
+  {
+    "model": "CRM.Status",
+    "pk": 2,
+    "fields": {
+      "name_status": "Отсутствует"
+    }
+  },
+  {
+    "model": "CRM.Status",
+    "pk": 3,
+    "fields": {
+      "name_status": "В командировке"
+    }
+  }
+]
