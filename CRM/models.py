@@ -25,14 +25,13 @@ class Qualifiacation(models.Model):
 class Worker(AbstractUser):
     first_name = models.CharField('Имя', max_length=150)
     last_name = models.CharField('Фамилия', max_length=150)
-    patronymic = models.CharField('Отчество', max_length=150, null=True)
+    patronymic = models.CharField('Отчество', max_length=150, null=True, blank=True)
     phone_number = models.CharField('Телефон', max_length=50, null=True, blank=True)
     email = models.CharField('Email', max_length=255, null=True, blank=True)
     is_admin_user = models.BooleanField('Администратор', default=0)
     is_manager_user = models.BooleanField('Менеджер', default=0)
     is_worker_user = models.BooleanField('Работник', default=0)
     is_first_login = models.BooleanField('Первый вход в систему', default=0)
-    is_online = models.BooleanField('Статус на сайте', default=0)
     status = models.ForeignKey(Status, on_delete=models.PROTECT, verbose_name='Статус работника', null=True)
     qualifiacation = models.ForeignKey(Qualifiacation, on_delete=models.PROTECT, verbose_name='Квалификация', null=True)
 
@@ -53,28 +52,6 @@ class Worker(AbstractUser):
         if self.is_worker_user:
             return True
         return False
-
-    @property
-    def is_online_user(self) -> bool:
-        if self.is_online:
-            return True
-        return False
-
-    def update_online_status(self):
-        if self.is_online_user:
-            return
-        self.is_online = True
-        self.status_id = 1
-        self.save()
-        return
-
-    def update_offline_status(self):
-        if not self.is_online_user:
-            return
-        self.is_online = False
-        self.status_id = 2
-        self.save()
-        return
 
     def get_update_first_user_login(self):
         if not self.is_first_login:

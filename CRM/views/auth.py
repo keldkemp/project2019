@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from CRM.models import Worker
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import PasswordChangeView, PasswordContextMixin, LogoutView
+from django.contrib.auth.views import PasswordChangeView, PasswordContextMixin
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
     RedirectView, TemplateView, UpdateView, CreateView, FormView
@@ -20,17 +20,9 @@ class CrmLoginRedirectView(RedirectView):
         elif not self.request.user.is_first_login:
             return reverse('accounts:password-change-first')
         elif self.request.user.is_admin or self.request.user.is_manager or self.request.user.is_worker:
-            self.request.user.update_online_status()
             return reverse('accounts:profile')
         else:
             return reverse('accounts:login')
-
-
-class CrmLogoutView(LogoutView):
-
-    def dispatch(self, request, *args, **kwargs):
-        self.request.user.update_offline_status()
-        return super().dispatch(request, *args, **kwargs)
 
 
 class PasswordChangeFirsView(LoginRequiredMixin, PasswordChangeView):

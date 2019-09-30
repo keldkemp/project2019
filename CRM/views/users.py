@@ -32,19 +32,20 @@ class CreateUser(PermissionRequiredMixin, FormView):
         return self.request.user
 
     def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
         username = self.request.user.generate_username(request.POST['first_name'],
                                                        request.POST['last_name'], request.POST['patronymic'])
         password = Worker.objects.make_random_password()
         if self.request.user.is_admin:
             user = Worker.objects.create_user(username=username, password=password, is_manager_user=True,
-                                              status_id=2,
+                                              status_id=request.POST['status'],
                                               qualifiacation_id=request.POST['qualifiacation'],
                                               first_name=request.POST['first_name'],
                                               last_name=request.POST['last_name'],
                                               patronymic=request.POST['patronymic'])
         elif self.request.user.is_manager:
             user = Worker.objects.create_user(username=username, password=password, is_worker_user=True,
-                                              status_id=2,
+                                              status_id=request.POST['status'],
                                               qualifiacation_id=request.POST['qualifiacation'],
                                               first_name=request.POST['first_name'],
                                               last_name=request.POST['last_name'],

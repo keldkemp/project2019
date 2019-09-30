@@ -7,7 +7,7 @@ auth_urlpatterns = ([
     path('', auth.CrmLoginRedirectView.as_view()),
     path('login/', auth_views.LoginView.as_view(template_name='CRM/auth/login.html'),
          name='login'),
-    path('logout/', auth.CrmLogoutView.as_view(), name='logout'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path(
         'redirect/',
         auth.CrmLoginRedirectView.as_view(),
