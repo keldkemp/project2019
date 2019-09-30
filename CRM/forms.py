@@ -10,12 +10,11 @@ from .models import (Worker)
 class UserForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
-        fields = ('first_name', 'last_name', 'patronymic', 'status', 'qualifiacation')
+        fields = ('first_name', 'last_name', 'patronymic', 'qualifiacation')
         widgets = {
             'last_name': forms.TextInput(attrs={"class": "form-control"}),
             'first_name': forms.TextInput(attrs={"class": "form-control"}),
             'patronymic': forms.TextInput(attrs={"class": "form-control"}),
-            'status': forms.Select(attrs={"class": "form-control"}),
             'qualifiacation': forms.Select(attrs={"class": "form-control"}),
         }
 
