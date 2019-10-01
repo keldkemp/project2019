@@ -7,6 +7,33 @@ from betterforms.multiform import MultiModelForm
 from .models import (Worker)
 
 
+class QualificationForm(forms.ModelForm):
+    class Meta:
+        model = get_user_model()
+        fields = ('qualifiacation',)
+        widgets = {
+            'qualifiacation': forms.Select(attrs={"class": "form-control"}),
+        }
+
+
+class Qualification2Form(forms.ModelForm):
+    class Meta:
+        model = get_user_model()
+        fields = ('qualifiacation',)
+        widgets = {
+            'qualifiacation': forms.TextInput(attrs={"class": "form-control"}),
+        }
+
+
+class Qualification3Form(forms.ModelForm):
+    class Meta:
+        model = get_user_model()
+        fields = ('qualifiacation',)
+        widgets = {
+            'qualifiacation': forms.TextInput(attrs={"class": "form-control"}),
+        }
+
+
 class ProfileUserForm(forms.ModelForm):
     fullname = forms.CharField(
         label='ФИО',

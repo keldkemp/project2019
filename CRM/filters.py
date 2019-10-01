@@ -1,9 +1,14 @@
-from datetime import datetime, timedelta
 import django_filters
-from django import forms
-from django.http import QueryDict
-from phonenumber_field import modelfields
-from django_select2.forms import Select2MultipleWidget
 
 from CRM import models
 
+
+class WorkerFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(
+        label='Искать по ФИО',
+        lookup_expr='icontains'
+    )
+
+    class Meta:
+        model = models.Worker
+        fields = ('name',)

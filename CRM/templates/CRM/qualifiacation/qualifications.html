@@ -1,0 +1,99 @@
+{% extends "CRM/bars/base.html" %}
+
+{% load bootstrap4 %}
+
+{% block extrahead %}
+ <script
+    src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/jquery.inputmask.bundle.js"
+  ></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="ml-4 mt-4 mr-4 container-fluid">
+    <legend class="border-bottom mb-2">Работники</legend>
+    <div style="background-color: #FFFFFF;" class="sticky-top">
+        <div class="row">
+            <div class="col-md-6">
+                <form class="form-inline mb-2"
+                      action="{% url 'qualifiacation:qualifications' %}" method="GET">
+                    <div class="input-group  ml-2 w-50">
+                        <input
+                                id="{{ filter.form.name.id_for_label }}"
+                                name="{{ filter.form.name.name }}"
+                                placeholder="{{ filter.form.name.label }}"
+                                value="{{ filter.form.name.data|default_if_none:'' }}"
+                                type="search"
+                                class="form-control form-control-sm"
+                        >
+                    </div>
+
+                    <input type="submit"
+                           value="Поиск" class=" ml-2 btn btn-sm btn-success"/>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="related-widget-wrapper">Квалификации:
+        <select name="qualifiacation" required="" id="id_qualifiacation">
+
+            <option value="1">Повар</option>
+
+            <option value="2" selected="">Разработчик</option>
+
+        </select>
+        <div class="container-fluid mt-1">
+            <a
+                    class="btn btn-sm btn-outline-info"
+                    href="
+                    {% url 'qualifiacation:create' %}"
+            >Изменить</a>
+            <a
+                    class="btn btn-sm btn-outline-info"
+                    href="
+                    {% url 'qualifiacation:create' %}"
+            >Добавить</a>
+            <a
+                    class="btn btn-sm btn-outline-danger"
+                    href="
+                    {% url 'qualifiacation:delete' %}"
+            >Удалить</a>
+        </div>
+    </div>
+
+    <table class="table table-sm table-bordered">
+        <thead>
+        <tr>
+            <th scope="col">Информация</th>
+        </tr>
+
+        </thead>
+        <tbody>
+        {% for user in users %}
+        <tr>
+            <td>
+                <div>
+                    ФИО: {{ user.last_name }}
+                    {{ user.first_name }}
+                    {{ user.patronymic }}
+                </div>
+                <div>
+                    Email: {{ user.email }}
+                </div>
+                <div>
+                    Квалификация: {{ user.qualifiacation }}
+                    <a
+                            class="btn btn-sm btn-outline-info"
+                            href="
+                            {% url 'qualifiacation:edit' %}"
+                    >Изменить</a>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% bootstrap_pagination page_obj extra=filter.data.urlencode %}
+</div>
+{% endblock %}

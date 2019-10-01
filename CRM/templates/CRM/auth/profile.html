@@ -34,7 +34,8 @@
       {% csrf_token %}
       <div>Логин: {{ user.username }}</div>
       <p></p>
-      <div>Квалификация: {{ user.qualifiacation }}</div>
+      <div>Квалификация: {{ user.qualifiacation }}
+      </div>
       <p></p>
       {% bootstrap_field form.user.fullname %}
       {% bootstrap_field form.user.last_name %}
