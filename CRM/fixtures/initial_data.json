@@ -19,5 +19,21 @@
     "fields": {
       "name_status": "В командировке"
     }
+  },
+  {
+    "model": "CRM.Qualifiacation",
+    "pk": 1,
+    "fields": {
+      "name_qualification": "Администратор",
+      "money_index": 365
+    }
+  },
+  {
+    "model": "CRM.Qualifiacation",
+    "pk": 2,
+    "fields": {
+      "name_qualification": "Менеджер",
+      "money_index": 365
+    }
   }
 ]

@@ -22,17 +22,18 @@
           </a>
         <p></p>
         {% endif %}
-       <table  border="1">
-           <tr><td width="300"><b>ФИО</b></td>
-          <td width="300"><b>Должность</b></td>
-               <td width="300"><b>Статус</b></td>
+       <table class="table table-sm table-bordered">
+           <tr>
+               <th scope="col"><b>ФИО</b></th>
+          <th scope="col"><b>Должность</b></th>
+               <th scope="col"><b>Статус</b></th>
         </tr>
         {%for user in users%}
 
 
 
         <tr>
-          <td> <div> {{ user.first_name }} {{ user.last_name }} {{ user.patronymic }}</div></td>
+          <td> <div> {{ user.last_name }} {{ user.first_name }} {{ user.patronymic }}</div></td>
          <td>{{ user.qualifiacation }}</td>
             <td>{{ user.status }}</td>
         </tr>
@@ -41,5 +42,6 @@
       </table>
 
     </form>
+      {% bootstrap_pagination page_obj extra=filter.data.urlencode %}
   </div>
 {% endblock %}

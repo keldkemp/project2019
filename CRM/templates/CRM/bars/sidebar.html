@@ -27,6 +27,20 @@
 
 
       </li>
+      {% if user.is_manager %}
+      <li>
+        <a
+          class="nav-link"
+          href="
+            {% url 'qualifications:list' %}"
+          name="Квалификации"
+        >
+          Квалификации
+        </a>
+
+
+      </li>
+      {% endif %}
       {% endif %}
     </ul>
   </div>

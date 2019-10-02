@@ -33,8 +33,8 @@ is_logged_personnel = rules.is_authenticated & (is_admin | is_manager | is_worke
 
 
 rules.add_perm('admin', is_logged_admin)
-rules.add_perm('manager', is_logged_admin)
-rules.add_perm('worker', is_logged_admin)
+rules.add_perm('manager', is_logged_manager)
+rules.add_perm('worker', is_logged_worker)
 
 rules.add_perm('profile', is_logged_personnel)
 rules.add_perm('add_user', is_logged_manager_admin)

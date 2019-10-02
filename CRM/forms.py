@@ -4,13 +4,19 @@ from django.contrib.auth import get_user_model
 from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput
 from betterforms.multiform import MultiModelForm
 
-from .models import (Worker)
+from .models import (Qualifiacation)
+
+
+class QualificationsForm(forms.ModelForm):
+    class Meta:
+        model = Qualifiacation
+        fields = ('name_qualification', 'money_index')
 
 
 class UserForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
-        fields = ('first_name', 'last_name', 'patronymic', 'qualifiacation')
+        fields = ('last_name', 'first_name',  'patronymic', 'qualifiacation')
         widgets = {
             'last_name': forms.TextInput(attrs={"class": "form-control"}),
             'first_name': forms.TextInput(attrs={"class": "form-control"}),
