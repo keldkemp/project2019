@@ -1,0 +1,47 @@
+{% extends "CRM/bars/base.html" %}
+
+{% load bootstrap4 %}
+
+{% block extrahead %}
+ <script
+    src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/jquery.inputmask.bundle.js"
+  ></script>
+
+{% endblock %}
+
+{% block content %}
+  <div class="content-section ml-4 mt-4 w-50">
+      <legend class="border-bottom mb-2">Список квалификаций </legend>
+    <form method="post">
+
+        <a name="add-new"
+             href="{% url 'qualifications:add' %}"
+             class="btn btn-sm btn-info"
+          >
+            Добавить должность
+          </a>
+        <p></p>
+
+       <table class="table table-sm table-bordered">
+            <tr>
+                <th scope="col"><b>Должность</b></th>
+                <th scope="col"><b>Индекс</b></th>
+            </tr>
+        {% for qualification in qualifications %}
+
+        <tr>
+          <td>
+              <a href="{% url 'qualifications:detail' qualification.id %}">
+                  <div>{{ qualification.name_qualification }}</div>
+              </a>
+          </td>
+         <td>{{ qualification.money_index }}</td>
+        </tr>
+
+  {% endfor %}
+      </table>
+
+    </form>
+      {% bootstrap_pagination page_obj extra=filter.data.urlencode %}
+  </div>
+{% endblock %}

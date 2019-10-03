@@ -7,11 +7,13 @@ from django.views.generic import (
 )
 from rules.contrib.views import PermissionRequiredMixin
 from CRM.forms import UserForm
+from CRM.filters import UsersFilter
 
 
 class ShowUsers(PermissionRequiredMixin, FilterView):
     model = Worker
-    queryset = model.objects.filter(is_superuser=False)
+    queryset = model.objects.filter(is_superuser=False).order_by('status_id', 'last_name')
+    filterset_class = UsersFilter
     template_name = 'CRM/users/users.html'
     context_object_name = 'users'
     paginate_by = 25
@@ -60,6 +62,9 @@ class PasswordSee(PermissionRequiredMixin, TemplateView):
     template_name = 'CRM/users/password.html'
     title = 'Password See'
     permission_required = 'add_user'
+
+    def get_object(self, queryset=None):
+        return self.request.user
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)

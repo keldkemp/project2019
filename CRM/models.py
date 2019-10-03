@@ -18,6 +18,9 @@ class Qualifiacation(models.Model):
     name_qualification = models.CharField('Квалификация работника', max_length=150)
     money_index = models.DecimalField('Индекс ЗП', max_digits=15, decimal_places=10)
 
+    def get_absolute_url(self):
+        return reverse('qualifications:detail', kwargs={'pk': self.pk})
+
     def __str__(self):
         return self.name_qualification
 
