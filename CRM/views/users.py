@@ -3,8 +3,8 @@ from django.shortcuts import render
 from CRM.models import Worker
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
-    RedirectView, TemplateView, UpdateView, CreateView, FormView
-)
+    RedirectView, TemplateView, UpdateView, CreateView, FormView,
+    DetailView)
 from rules.contrib.views import PermissionRequiredMixin
 from CRM.forms import UserForm
 from CRM.filters import UsersFilter
@@ -21,6 +21,17 @@ class ShowUsers(PermissionRequiredMixin, FilterView):
 
     def get_object(self, queryset=None):
         return self.request.user
+
+
+
+
+class DetailUsers (PermissionRequiredMixin, DetailView):
+    model = Worker
+    template_name = 'CRM/users/detail.html'
+    context_object_name = 'user'
+    permission_required = 'admin'
+
+
 
 
 class CreateUser(PermissionRequiredMixin, FormView):
