@@ -9,35 +9,45 @@
 
 
 <div class="container-fluid mt-4 ml-2">
-    <legend class="mb-2">{{user.last_name }} {{user.first_name}} {{user.patronymic}}</legend>
+    <legend class="mb-2">{{user_detail.last_name }} {{user_detail.first_name}} {{user_detail.patronymic}}</legend>
     <div class="row border-top mb-2">
       <div class="container-fluid mt-1">
 
         <a
-          name="cancel" href="{% url 'qualifications:list' %}"
+          name="cancel" href="{% url 'users:list' %}"
           class="btn btn-sm btn-outline-info"
         >Назад</a>
+          {% if user.is_admin and user_detail.is_manager %}
           <a
             class="btn btn-sm btn-outline-danger"
-            href="{% url 'qualifications:delete' object.id %}"
+            href="{% url 'users:delete' object.id %}"
           >Удалить</a>
+          {% endif %}
+          {% if user.is_manager and user_detail.is_worker %}
+          <a
+            class="btn btn-sm btn-outline-danger"
+            href="{% url 'users:delete' object.id %}"
+          >Удалить</a>
+          {% endif %}
       </div>
     </div>
     <div class="row">
         <div class="col-3 border-right">
-            {% if user.email %}
+            {% if user_detail.email %}
                 <div class="font-weight-bold">Почта:</div>
             {% endif %}
-           
-                <div class="font-weight-bold">Номер телефона</div>
+            {% if user_detail.phone_number %}
+                <div class="font-weight-bold">Номер телефона:</div>
+            {% endif %}
 
         </div>
         <div class="col">
-            <div>{{ user.email }} </div>
-            <div>{{ user.phone_number }} </div>
-        </div>
-        <div class="col-2 border-right">
-            <img id="profile_pic" class="rounded"/>
+            {% if user_detail.email %}
+                <div>{{ user_detail.email }} </div>
+            {% endif %}
+            {% if user_detail.phone_number %}
+                <div>{{ user_detail.phone_number }} </div>
+            {% endif %}
         </div>
     </div>
 </div>
