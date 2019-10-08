@@ -3,8 +3,8 @@ from django.shortcuts import render
 from CRM.models import Worker
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
-    RedirectView, TemplateView, UpdateView, CreateView, FormView
-)
+    RedirectView, TemplateView, UpdateView, CreateView, FormView,
+    DetailView, DeleteView)
 from rules.contrib.views import PermissionRequiredMixin
 from CRM.forms import UserForm
 from CRM.filters import UsersFilter
@@ -19,8 +19,28 @@ class ShowUsers(PermissionRequiredMixin, FilterView):
     paginate_by = 25
     permission_required = 'users_list'
 
-    def get_object(self, queryset=None):
-        return self.request.user
+    def get_permission_object(self):
+        self.request.user
+
+
+class DeleteUsers(PermissionRequiredMixin, DeleteView):
+    model = Worker
+    template_name = 'CRM/users/confirm_delete.html'
+    success_url = reverse_lazy('users:list')
+    permission_required = 'delete_user'
+
+    def get_permission_object(self):
+        self.request.user
+
+
+class DetailUsers (PermissionRequiredMixin, DetailView):
+    model = Worker
+    template_name = 'CRM/users/detail.html'
+    context_object_name = 'user_detail'
+    permission_required = 'users_list'
+
+    def get_permission_object(self):
+        self.request.user
 
 
 class CreateUser(PermissionRequiredMixin, FormView):
@@ -30,8 +50,8 @@ class CreateUser(PermissionRequiredMixin, FormView):
     template_name = 'CRM/users/add.html'
     permission_required = 'add_user'
 
-    def get_object(self, queryset=None):
-        return self.request.user
+    def get_permission_object(self):
+        self.request.user
 
     def post(self, request, *args, **kwargs):
         username = self.request.user.generate_username(request.POST['first_name'],
@@ -63,8 +83,8 @@ class PasswordSee(PermissionRequiredMixin, TemplateView):
     title = 'Password See'
     permission_required = 'add_user'
 
-    def get_object(self, queryset=None):
-        return self.request.user
+    def get_permission_object(self):
+        self.request.user
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)

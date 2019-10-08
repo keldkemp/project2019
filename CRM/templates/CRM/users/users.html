@@ -33,7 +33,7 @@
 
 
         <tr>
-          <td> <div> {{ user.last_name }} {{ user.first_name }} {{ user.patronymic }}</div></td>
+            <td> <div> <a href="{% url 'users:detail' user.id %}">{{ user.last_name }} {{ user.first_name }} {{ user.patronymic }}</a></div></td>
          <td>{{ user.qualifiacation }}</td>
             <td>{{ user.status }}</td>
         </tr>
