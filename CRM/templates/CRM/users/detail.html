@@ -17,6 +17,12 @@
           name="cancel" href="{% url 'users:list' %}"
           class="btn btn-sm btn-outline-info"
         >Назад</a>
+          {% if user.is_manager %}
+          <a
+          name="cancel" href="{% url 'users:update' object.id %}"
+          class="btn btn-sm btn-outline-info"
+        >Редактировать</a>
+          {% endif %}
           {% if user.is_admin and user_detail.is_manager %}
           <a
             class="btn btn-sm btn-outline-danger"
@@ -33,6 +39,9 @@
     </div>
     <div class="row">
         <div class="col-3 border-right">
+            {% if user_detail.qualifiacation %}
+                <div class="font-weight-bold">Должность:</div>
+            {% endif %}
             {% if user_detail.email %}
                 <div class="font-weight-bold">Почта:</div>
             {% endif %}
@@ -42,6 +51,9 @@
 
         </div>
         <div class="col">
+            {% if user_detail.qualifiacation %}
+                <div>{{ user_detail.qualifiacation }} </div>
+            {% endif %}
             {% if user_detail.email %}
                 <div>{{ user_detail.email }} </div>
             {% endif %}

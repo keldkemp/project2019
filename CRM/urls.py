@@ -26,6 +26,7 @@ auth_urlpatterns = ([
 users_urlpatterns = ([
     path('', users.ShowUsers.as_view(), name='list'),
     path('<int:pk>', users.DetailUsers.as_view(), name='detail'),
+    path('<int:pk>/update/', users.UpdateUsers.as_view(), name='update'),
     path('<int:pk>/delete/', users.DeleteUsers.as_view(), name='delete'),
     path('add/', users.CreateUser.as_view(), name='add'),
     path('add/password-see/', users.PasswordSee.as_view(), name='password-see'),

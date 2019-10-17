@@ -6,7 +6,7 @@ from django.views.generic import (
     RedirectView, TemplateView, UpdateView, CreateView, FormView,
     DetailView, DeleteView)
 from rules.contrib.views import PermissionRequiredMixin
-from CRM.forms import UserForm
+from CRM.forms import UserForm, UserUpdateForm
 from CRM.filters import UsersFilter
 
 
@@ -38,6 +38,16 @@ class DetailUsers (PermissionRequiredMixin, DetailView):
     template_name = 'CRM/users/detail.html'
     context_object_name = 'user_detail'
     permission_required = 'users_list'
+
+    def get_permission_object(self):
+        self.request.user
+
+
+class UpdateUsers(PermissionRequiredMixin, UpdateView):
+    model = Worker
+    form_class = UserUpdateForm
+    template_name = 'CRM/users/update.html'
+    permission_required = 'manager'
 
     def get_permission_object(self):
         self.request.user

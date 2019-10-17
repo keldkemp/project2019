@@ -1,0 +1,31 @@
+{% extends "CRM/bars/base.html" %}
+
+{% load bootstrap4 %}
+
+{% block nav %}
+{% endblock nav %}
+
+
+{% block content %}
+
+
+<div class="container-fluid mt-4 ml-2">
+    <legend class="mb-2">{{user_detail.last_name }} {{user_detail.first_name}} {{user_detail.patronymic}}</legend>
+    <div class="w-25">
+        <form method="POST">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Изменить</button>
+                <a
+                  name="cancel"
+                  href="{% if object.id %}{% url 'users:detail' object.id %}{% else %}{% url 'users:list' %}{% endif %}"
+                  class="btn btn-outline-info">
+                      Назад
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock content %}
