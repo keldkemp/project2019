@@ -53,5 +53,27 @@
       {% endif %}
 
     </form>
+    {% if times %}
+    <p></p>
+    <table class="table table-sm table-bordered">
+        <tr>
+                <th scope="col"><b>Время прихода на работу</b></th>
+                <th scope="col"><b>Время ухода с работы</b></th>
+            </tr>
+        {% for time in times %}
+
+        <tr>
+          <td>{{ time.time_of_arrival }}</td>
+          {% if time.time_of_leaving %}
+                <td>{{ time.time_of_leaving }}</td>
+          {% else %}
+                <td>Сейчас на работе</td>
+          {% endif %}
+        </tr>
+
+  {% endfor %}
+      </table>
+    {% bootstrap_pagination times extra=filter.data.urlencode %}
+    {% endif %}
   </div>
 {% endblock %}
