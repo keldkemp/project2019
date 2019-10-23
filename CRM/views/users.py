@@ -1,6 +1,6 @@
 from django_filters.views import FilterView
 from django.shortcuts import render
-from CRM.models import Worker
+from CRM.models import Worker, Time
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
     RedirectView, TemplateView, UpdateView, CreateView, FormView,
@@ -8,6 +8,9 @@ from django.views.generic import (
 from rules.contrib.views import PermissionRequiredMixin
 from CRM.forms import UserForm, UserUpdateForm
 from CRM.filters import UsersFilter
+from django.core.paginator import Paginator
+from django.core.paginator import EmptyPage
+from django.core.paginator import PageNotAnInteger
 
 
 class ShowUsers(PermissionRequiredMixin, FilterView):
@@ -38,9 +41,27 @@ class DetailUsers (PermissionRequiredMixin, DetailView):
     template_name = 'CRM/users/detail.html'
     context_object_name = 'user_detail'
     permission_required = 'users_list'
+    paginate_by = 7
 
     def get_permission_object(self):
         self.request.user
+
+    def get_context_data(self, **kwargs):
+        context = super(DetailUsers, self).get_context_data(**kwargs)
+        list_exam = Time.objects.filter(worker_id=context['user_detail'].id).order_by('-pk')
+        paginator = Paginator(list_exam, self.paginate_by)
+
+        page = self.request.GET.get('page')
+
+        try:
+            file_exams = paginator.page(page)
+        except PageNotAnInteger:
+            file_exams = paginator.page(1)
+        except EmptyPage:
+            file_exams = paginator.page(paginator.num_pages)
+
+        context['times'] = file_exams
+        return context
 
 
 class UpdateUsers(PermissionRequiredMixin, UpdateView):

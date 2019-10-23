@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from CRM.models import Worker
+from CRM.models import Worker, Time
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import PasswordChangeView, PasswordContextMixin, LogoutView
 from django.urls import reverse, reverse_lazy
@@ -8,6 +8,9 @@ from django.views.generic import (
 )
 from rules.contrib.views import PermissionRequiredMixin
 from CRM.forms import ProfileAdminForm, UserForm
+from django.core.paginator import Paginator
+from django.core.paginator import EmptyPage
+from django.core.paginator import PageNotAnInteger
 
 
 class CrmLoginRedirectView(RedirectView):
@@ -18,6 +21,7 @@ class CrmLoginRedirectView(RedirectView):
         elif self.request.user.is_superuser:
             return reverse('admin:index')
         elif not self.request.user.is_first_login:
+            self.request.user.update_online_status()
             self.request.user.update_online_status()
             return reverse('accounts:password-change-first')
         elif self.request.user.is_admin or self.request.user.is_manager or self.request.user.is_worker:
@@ -31,6 +35,7 @@ class CrmLogoutView(LogoutView):
 
     def dispatch(self, request, *args, **kwargs):
         self.request.user.update_offline_status()
+        self.request.user.update_time_leaving()
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -59,6 +64,24 @@ class ProfileView(PermissionRequiredMixin, UpdateView):
     template_name = 'CRM/auth/profile.html'
     success_url = reverse_lazy('accounts:profile')
     permission_required = 'profile'
+    paginate_by = 7
+
+    def get_context_data(self, **kwargs):
+        context = super(ProfileView, self).get_context_data(**kwargs)
+        list_exam = Time.objects.filter(worker_id=self.request.user.id).order_by('-pk')
+        paginator = Paginator(list_exam, self.paginate_by)
+
+        page = self.request.GET.get('page')
+
+        try:
+            file_exams = paginator.page(page)
+        except PageNotAnInteger:
+            file_exams = paginator.page(1)
+        except EmptyPage:
+            file_exams = paginator.page(paginator.num_pages)
+
+        context['times'] = file_exams
+        return context
 
     def get_object(self, queryset=None):
         return self.request.user
