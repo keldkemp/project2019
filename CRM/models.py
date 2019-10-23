@@ -5,6 +5,8 @@ from transliterate import translit
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+import datetime
+import pytz
 
 
 class Status(models.Model):
@@ -84,6 +86,18 @@ class Worker(AbstractUser):
             self.is_first_login = True
             self.save()
 
+    def update_time_arrival(self):
+        if not Time.objects.filter(time_of_arrival__range=(datetime.date.today(), datetime.date.today()+datetime.timedelta(days=1)), worker_id=self.id).exists():
+            Time(worker_id=self.id, time_of_arrival=datetime.datetime.now(pytz.utc)).save()
+
+    def update_time_leaving(self):
+        if not Time.objects.filter(time_of_arrival__range=(datetime.date.today(), datetime.date.today()+datetime.timedelta(days=1)), worker_id=self.id).exists():
+            Time(worker_id=self.id, time_of_arrival=datetime.datetime.now(pytz.utc)).save()
+        time = Time.objects.get(time_of_arrival__range=(datetime.date.today(), datetime.date.today()+datetime.timedelta(days=1)), worker_id=self.id)
+        time.time_of_leaving = datetime.datetime.now(pytz.utc)
+        time.time_per_day = (time.time_of_leaving - time.time_of_arrival).total_seconds()
+        time.save()
+
     def generate_username(self, first_name: str, last_name: str, patronymic: str) -> str:
         first_name = first_name[0]
         patronymic = patronymic[0]
@@ -104,6 +118,9 @@ class Worker(AbstractUser):
             name_change = ''.join([name, str(idx)])
             if not Worker.objects.filter(username=name_change).exists():
                 return ''.join([name, str(idx)])
+
+    def get_absolute_url(self):
+        return reverse('users:detail', kwargs={'pk': self.pk})
 
 
 class Salary(models.Model):

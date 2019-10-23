@@ -7,6 +7,15 @@ from betterforms.multiform import MultiModelForm
 from .models import (Qualifiacation)
 
 
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = get_user_model()
+        fields = ('qualifiacation', )
+        widgets = {
+            'qualifiacation': forms.Select(attrs={"class": "form-control"}),
+        }
+
+
 class QualificationsForm(forms.ModelForm):
     class Meta:
         model = Qualifiacation
