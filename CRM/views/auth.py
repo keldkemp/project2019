@@ -26,6 +26,7 @@ class CrmLoginRedirectView(RedirectView):
             return reverse('accounts:password-change-first')
         elif self.request.user.is_admin or self.request.user.is_manager or self.request.user.is_worker:
             self.request.user.update_online_status()
+            self.request.user.update_time_arrival()
             return reverse('accounts:profile')
         else:
             return reverse('accounts:login')
