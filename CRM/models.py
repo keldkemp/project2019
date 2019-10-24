@@ -65,8 +65,14 @@ class Worker(AbstractUser):
             return True
         return False
 
+    @property
+    def is_command_status(self) -> bool:
+        if self.status_id == 3:
+            return True
+        return False
+
     def update_online_status(self):
-        if self.is_online_user:
+        if self.is_online_user and self.is_command_status:
             return
         self.is_online = True
         self.status_id = 1
@@ -76,10 +82,18 @@ class Worker(AbstractUser):
     def update_offline_status(self):
         if not self.is_online_user:
             return
+        if self.is_command_status:
+            return
         self.is_online = False
         self.status_id = 2
         self.save()
         return
+
+    def update_command_status(self):
+        if self.is_command_status:
+            return
+        self.status_id = 3
+        self.save()
 
     def get_update_first_user_login(self):
         if not self.is_first_login:
