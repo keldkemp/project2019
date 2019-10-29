@@ -69,9 +69,21 @@ class UpdateUsers(PermissionRequiredMixin, UpdateView):
     form_class = UserUpdateForm
     template_name = 'CRM/users/update.html'
     permission_required = 'manager'
+    context_object_name = 'user_detail'
 
     def get_permission_object(self):
         self.request.user
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            if request.POST['send_to_mission'] == '3':
+                self.object.update_command_status()
+                self.object.create_send_to_mission(request.POST['start_mission'], request.POST['end_mission'])
+                return super().post(request, *args, **kwargs)
+        except:
+            return super().post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
 
 class CreateUser(PermissionRequiredMixin, FormView):

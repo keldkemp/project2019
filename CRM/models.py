@@ -112,6 +112,10 @@ class Worker(AbstractUser):
         time.time_per_day = (time.time_of_leaving - time.time_of_arrival).total_seconds()
         time.save()
 
+    def create_send_to_mission(self, start_date, end_date):
+        time_per_day = (end_date - start_date).total_seconds()
+        Time(worker_id=self.id, time_of_arrival=start_date, time_of_leaving=end_date, time_per_day=time_per_day).save()
+
     def generate_username(self, first_name: str, last_name: str, patronymic: str) -> str:
         first_name = first_name[0]
         patronymic = patronymic[0]

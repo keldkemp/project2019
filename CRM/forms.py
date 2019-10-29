@@ -13,7 +13,6 @@ class UserUpdateForm(forms.ModelForm):
         fields = ('qualifiacation', 'status')
         widgets = {
             'qualifiacation': forms.Select(attrs={"class": "form-control"}),
-            'status': forms.Select(attrs={"class": "form-control"}),
         }
 
 
