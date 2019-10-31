@@ -16,7 +16,7 @@
             {% bootstrap_form form %}
             <div class="form-group">
                 <button class="btn btn-outline-info" type="submit">Изменить</button>
-                {% if object.is_command_status %}
+                {% if not object.is_command_status %}
                 <!-- Кнопка пуска модальное окно -->
                 <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#myModal">
                     Командировка

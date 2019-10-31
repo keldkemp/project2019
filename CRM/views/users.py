@@ -76,14 +76,10 @@ class UpdateUsers(PermissionRequiredMixin, UpdateView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        try:
-            if request.POST['send_to_mission'] == '3':
-                self.object.update_command_status()
-                self.object.create_send_to_mission(request.POST['start_mission'], request.POST['end_mission'])
-                return super().post(request, *args, **kwargs)
-        except:
+        if request.POST['send_to_mission'] == '3':
+            self.object.update_command_status()
+            self.object.create_send_to_mission(request.POST['start_mission'], request.POST['end_mission'])
             return super().post(request, *args, **kwargs)
-        return super().post(request, *args, **kwargs)
 
 
 class CreateUser(PermissionRequiredMixin, FormView):

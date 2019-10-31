@@ -7,6 +7,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 import datetime
 import pytz
+from decimal import Decimal
 
 
 class Status(models.Model):
@@ -72,7 +73,7 @@ class Worker(AbstractUser):
         return False
 
     def update_online_status(self):
-        if self.is_online_user and self.is_command_status:
+        if self.is_online_user and not self.is_command_status:
             return
         self.is_online = True
         self.status_id = 1
@@ -80,9 +81,7 @@ class Worker(AbstractUser):
         return
 
     def update_offline_status(self):
-        if not self.is_online_user:
-            return
-        if self.is_command_status:
+        if not self.is_online_user and not self.is_command_status:
             return
         self.is_online = False
         self.status_id = 2
@@ -109,12 +108,16 @@ class Worker(AbstractUser):
             Time(worker_id=self.id, time_of_arrival=datetime.datetime.now(pytz.utc)).save()
         time = Time.objects.get(time_of_arrival__range=(datetime.date.today(), datetime.date.today()+datetime.timedelta(days=1)), worker_id=self.id)
         time.time_of_leaving = datetime.datetime.now(pytz.utc)
-        time.time_per_day = (time.time_of_leaving - time.time_of_arrival).total_seconds()
+        time.time_per_day = (time.time_of_leaving - time.time_of_arrival).total_seconds() / 60
         time.save()
 
     def create_send_to_mission(self, start_date, end_date):
-        time_per_day = (end_date - start_date).total_seconds()
-        Time(worker_id=self.id, time_of_arrival=start_date, time_of_leaving=end_date, time_per_day=time_per_day).save()
+        start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d')
+        end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d')
+        Time(worker_id=self.id, time_of_arrival=start_date, time_of_leaving=end_date).save()
+        time = Time.objects.get(worker_id=self.id, time_of_arrival=start_date, time_of_leaving=end_date)
+        time.time_per_day = (time.time_of_leaving - time.time_of_arrival).total_seconds() / 60
+        time.save()
 
     def generate_username(self, first_name: str, last_name: str, patronymic: str) -> str:
         first_name = first_name[0]

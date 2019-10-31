@@ -10,7 +10,7 @@ from .models import (Qualifiacation)
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
-        fields = ('qualifiacation', 'status')
+        fields = ('qualifiacation',)
         widgets = {
             'qualifiacation': forms.Select(attrs={"class": "form-control"}),
         }
