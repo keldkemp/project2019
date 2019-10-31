@@ -76,7 +76,6 @@ class UpdateUsers(PermissionRequiredMixin, UpdateView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.object.payment_money()
         try:
             if request.POST['send_to_mission'] == '3':
                 self.object.update_command_status()
