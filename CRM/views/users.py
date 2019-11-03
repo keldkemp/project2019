@@ -11,6 +11,8 @@ from CRM.filters import UsersFilter
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
+import datetime
+from CRM.models import Salary
 
 
 class ShowUsers(PermissionRequiredMixin, FilterView):
@@ -24,6 +26,20 @@ class ShowUsers(PermissionRequiredMixin, FilterView):
 
     def get_permission_object(self):
         self.request.user
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(ShowUsers, self).get_context_data(**kwargs)
+        context['time'] = datetime.date.today().day
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.request.user
+        try:
+            if request.POST['payment_money'] == '1':
+                self.object.payment_money()
+                return super().get(request, *args, **kwargs)
+        except:
+            return super().get(request, *args, **kwargs)
 
 
 class DeleteUsers(PermissionRequiredMixin, DeleteView):
@@ -49,6 +65,7 @@ class DetailUsers (PermissionRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(DetailUsers, self).get_context_data(**kwargs)
         list_exam = Time.objects.filter(worker_id=context['user_detail'].id).order_by('-pk')
+        money = Salary.objects.filter(worker_id=context['user_detail'].id).order_by('-pk')
         paginator = Paginator(list_exam, self.paginate_by)
 
         page = self.request.GET.get('page')
@@ -61,6 +78,7 @@ class DetailUsers (PermissionRequiredMixin, DetailView):
             file_exams = paginator.page(paginator.num_pages)
 
         context['times'] = file_exams
+        context['money'] = money
         return context
 
 
@@ -76,9 +94,12 @@ class UpdateUsers(PermissionRequiredMixin, UpdateView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if request.POST['send_to_mission'] == '3':
-            self.object.update_command_status()
-            self.object.create_send_to_mission(request.POST['start_mission'], request.POST['end_mission'])
+        try:
+            if request.POST['send_to_mission'] == '3':
+                self.object.update_command_status()
+                self.object.create_send_to_mission(request.POST['start_mission'], request.POST['end_mission'])
+                return super().post(request, *args, **kwargs)
+        except:
             return super().post(request, *args, **kwargs)
 
 

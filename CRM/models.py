@@ -132,6 +132,18 @@ class Worker(AbstractUser):
         time.time_per_day = (time.time_of_leaving.day - time.time_of_arrival.day + 1) * 8
         time.save()
 
+    def payment_money(self):
+        users = Worker.objects.filter(is_superuser=False)
+        for user in users:
+            time_for_user = Time.objects.filter(worker_id=user.id)
+            all_time_in_month = 0
+            for time in time_for_user:
+                all_time_in_month = time.time_per_day + all_time_in_month
+            qualification = user.qualifiacation.money_index
+            money = qualification * all_time_in_month
+            Salary(worker_id=user.id, sum_salary=money).save()
+        return True
+
     def generate_username(self, first_name: str, last_name: str, patronymic: str) -> str:
         first_name = first_name[0]
         patronymic = patronymic[0]

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from CRM.models import Worker, Time
+from CRM.models import Worker, Time, Salary
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import PasswordChangeView, PasswordContextMixin, LogoutView
 from django.urls import reverse, reverse_lazy
@@ -70,6 +70,7 @@ class ProfileView(PermissionRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super(ProfileView, self).get_context_data(**kwargs)
         list_exam = Time.objects.filter(worker_id=self.request.user.id).order_by('-pk')
+        money = Salary.objects.filter(worker_id=self.request.user.id).order_by('-pk')
         paginator = Paginator(list_exam, self.paginate_by)
 
         page = self.request.GET.get('page')
@@ -82,6 +83,7 @@ class ProfileView(PermissionRequiredMixin, UpdateView):
             file_exams = paginator.page(paginator.num_pages)
 
         context['times'] = file_exams
+        context['money'] = money
         return context
 
     def get_object(self, queryset=None):

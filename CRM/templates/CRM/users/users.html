@@ -10,6 +10,8 @@
 {% endblock %}
 
 {% block content %}
+<form method="POST">
+            {% csrf_token %}
   <div class="content-section ml-4 mt-4 w-50">
       <legend class="border-bottom mb-2">Список работников </legend>
     <form method="post">
@@ -20,8 +22,11 @@
           >
             Добавить сотрудника
           </a>
-        <p></p>
         {% endif %}
+        {% if user.is_manager_user and time == 3 or user.is_manager_user and time == 18 %}
+        <button class="btn btn-sm btn-success" type="submit" value="1" name="payment_money">Начать расчет Заработной платы</button>
+        {% endif %}
+        <p></p>
        <table class="table table-sm table-bordered">
            <tr>
                <th scope="col"><b>ФИО</b></th>
@@ -44,4 +49,5 @@
     </form>
       {% bootstrap_pagination page_obj extra=filter.data.urlencode %}
   </div>
+</form>
 {% endblock %}
