@@ -33,3 +33,13 @@ class TenantUserAdmin(UserAdmin):
     )
     form = TenantUserChangeForm
     add_form = TenantUserCreateForm
+
+
+@admin.register(models.Salary)
+class SalaryAdmin(admin.ModelAdmin):
+    list_display = ('worker', 'sum_salary', 'date_accruals')
+
+
+@admin.register(models.Time)
+class SalaryAdmin(admin.ModelAdmin):
+    list_display = ('worker', 'time_of_arrival', 'time_of_leaving', 'time_per_day')
