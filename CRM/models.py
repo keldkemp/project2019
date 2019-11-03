@@ -171,7 +171,7 @@ class Worker(AbstractUser):
 
 class Salary(models.Model):
     worker = models.ForeignKey(Worker, on_delete=models.PROTECT, verbose_name='Работник')
-    sum_salary = models.DecimalField('Сумма денег за период', max_digits=15, decimal_places=10)
+    sum_salary = models.DecimalField('Сумма денег за период', max_digits=15, decimal_places=2)
     date_accruals = models.DateField('Дата начисления', default=timezone.now)
 
 
