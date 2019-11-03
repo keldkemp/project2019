@@ -8,7 +8,7 @@
 {% block content %}
 
 
-<div class="container-fluid mt-4 ml-2">
+<div class="container-fluid mt-4 ml-2 ">
     <legend class="mb-2">{{user_detail.last_name }} {{user_detail.first_name}} {{user_detail.patronymic}}</legend>
     <div class="row border-top mb-2">
       <div class="container-fluid mt-1">
@@ -63,6 +63,23 @@
         </div>
     </div>
     {% if user.is_manager %}
+    {% if money %}
+    <p></p>
+    <table class="table table-sm table-bordered">
+        <tr>
+                <th scope="col"><b>Дата начисления заработной платы</b></th>
+                <th scope="col"><b>Деньги</b></th>
+            </tr>
+        {% for money in money %}
+
+        <tr>
+          <td>{{ money.date_accruals }}</td>
+            <td>{{ money.sum_salary }} руб.</td>
+        </tr>
+
+  {% endfor %}
+      </table>
+      {% endif %}
     {% if times %}
     <p></p>
     <table class="table table-sm table-bordered">
