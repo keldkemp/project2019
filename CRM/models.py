@@ -73,7 +73,7 @@ class Worker(AbstractUser):
         return False
 
     def update_online_status(self):
-        if self.is_online_user and not self.is_command_status:
+        if self.is_online_user or self.is_command_status:
             return
         self.is_online = True
         self.status_id = 1
@@ -81,7 +81,7 @@ class Worker(AbstractUser):
         return
 
     def update_offline_status(self):
-        if not self.is_online_user and not self.is_command_status:
+        if not self.is_online_user or self.is_command_status:
             return
         self.is_online = False
         self.status_id = 2
@@ -102,21 +102,34 @@ class Worker(AbstractUser):
     def update_time_arrival(self):
         if not Time.objects.filter(time_of_arrival__range=(datetime.date.today(), datetime.date.today()+datetime.timedelta(days=1)), worker_id=self.id).exists():
             Time(worker_id=self.id, time_of_arrival=datetime.datetime.now(pytz.utc)).save()
+            if self.is_command_status:
+                self.status_id = 1
+                self.save()
 
     def update_time_leaving(self):
+        if self.is_command_status:
+            return
         if not Time.objects.filter(time_of_arrival__range=(datetime.date.today(), datetime.date.today()+datetime.timedelta(days=1)), worker_id=self.id).exists():
             Time(worker_id=self.id, time_of_arrival=datetime.datetime.now(pytz.utc)).save()
         time = Time.objects.get(time_of_arrival__range=(datetime.date.today(), datetime.date.today()+datetime.timedelta(days=1)), worker_id=self.id)
         time.time_of_leaving = datetime.datetime.now(pytz.utc)
-        time.time_per_day = (time.time_of_leaving - time.time_of_arrival).total_seconds() / 60
+        time.time_per_day = (time.time_of_leaving - time.time_of_arrival).total_seconds() / 3600
         time.save()
 
     def create_send_to_mission(self, start_date, end_date):
         start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d')
         end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d')
-        Time(worker_id=self.id, time_of_arrival=start_date, time_of_leaving=end_date).save()
-        time = Time.objects.get(worker_id=self.id, time_of_arrival=start_date, time_of_leaving=end_date)
-        time.time_per_day = (time.time_of_leaving - time.time_of_arrival).total_seconds() / 60
+        end_date = end_date + datetime.timedelta(hours=18)
+        start_date = start_date + datetime.timedelta(hours=8)
+        if Time.objects.filter(time_of_arrival__range=(datetime.date.today(), datetime.date.today()+datetime.timedelta(days=1)), worker_id=self.id).exists():
+            time = Time.objects.get(
+                time_of_arrival__range=(datetime.date.today(), datetime.date.today() + datetime.timedelta(days=1)),
+                worker_id=self.id)
+        else:
+            Time(worker_id=self.id, time_of_arrival=start_date, time_of_leaving=end_date).save()
+            time = Time.objects.get(worker_id=self.id, time_of_arrival=start_date, time_of_leaving=end_date)
+        time.time_of_leaving = end_date
+        time.time_per_day = (time.time_of_leaving.day - time.time_of_arrival.day + 1) * 8
         time.save()
 
     def generate_username(self, first_name: str, last_name: str, patronymic: str) -> str:
