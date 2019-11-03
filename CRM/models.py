@@ -176,7 +176,7 @@ class Salary(models.Model):
 
 
 class Time(models.Model):
-    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Работник')
+    worker = models.ForeignKey(Worker, on_delete=models.PROTECT, verbose_name='Работник')
     time_of_arrival = models.DateTimeField('Время прихода', default=timezone.now)
     time_of_leaving = models.DateTimeField('Время ухода', null=True)
     time_per_day = models.DecimalField('Время за день', null=True, max_digits=15, decimal_places=10)
