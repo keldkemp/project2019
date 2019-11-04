@@ -134,6 +134,8 @@ class Worker(AbstractUser):
 
     def payment_money(self):
         users = Worker.objects.filter(is_superuser=False)
+        if Salary.objects.filter(date_accruals=datetime.date.today()).exists():
+            return False
         for user in users:
             time_for_user = Time.objects.filter(worker_id=user.id)
             all_time_in_month = 0
