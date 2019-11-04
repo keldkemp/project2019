@@ -145,7 +145,22 @@ class Worker(AbstractUser):
         return True
 
     def give_prize(self, money):
-
+        data_start_const = 5
+        data_end_const = 20
+        star_data = datetime.date.today()
+        end_data = datetime.date.today()
+        if star_data.day >= data_end_const or star_data.day < 5:
+            star_data = datetime.date(star_data.year, star_data.month - 1, data_end_const)
+            end_data = datetime.date(end_data.year, end_data.month, data_start_const)
+        else:
+            star_data = datetime.date(star_data.year, star_data.month, data_end_const)
+            end_data = datetime.date(end_data.year, end_data.month + 1, data_start_const)
+        if Prize.objects.filter(date_accruals__range=(star_data, end_data), worker_id=self.id).exists():
+           prize = Prize.objects.get(worker_id=self.id, date_accruals__range=(star_data, end_data))
+           prize.sum_salary = prize.sum_salary + int(money)
+           prize.save()
+        else:
+            Prize(worker_id=self.id, sum_salary=money).save()
         return True
 
     def generate_username(self, first_name: str, last_name: str, patronymic: str) -> str:

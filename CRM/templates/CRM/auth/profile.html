@@ -53,6 +53,23 @@
       {% endif %}
 
     </form>
+      {% if prize %}
+            <p></p>
+            <table class="table table-sm table-bordered">
+            <tr>
+                <th scope="col"><b>Дата начисления премии</b></th>
+                <th scope="col"><b>Премии</b></th>
+                </tr>
+            {% for prize in prize %}
+
+            <tr>
+                <td>{{ prize.date_accruals }}</td>
+                <td>{{ prize.sum_salary }} руб.</td>
+            </tr>
+
+            {% endfor %}
+             </table>
+        {% endif %}
       {% if money %}
     <p></p>
     <table class="table table-sm table-bordered">
