@@ -144,6 +144,10 @@ class Worker(AbstractUser):
             Salary(worker_id=user.id, sum_salary=money).save()
         return True
 
+    def give_prize(self, money):
+
+        return True
+
     def generate_username(self, first_name: str, last_name: str, patronymic: str) -> str:
         first_name = first_name[0]
         patronymic = patronymic[0]
@@ -170,13 +174,19 @@ class Worker(AbstractUser):
 
 
 class Salary(models.Model):
-    worker = models.ForeignKey(Worker, on_delete=models.PROTECT, verbose_name='Работник')
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Работник')
     sum_salary = models.DecimalField('Сумма денег за период', max_digits=15, decimal_places=2)
     date_accruals = models.DateField('Дата начисления', default=timezone.now)
 
 
 class Time(models.Model):
-    worker = models.ForeignKey(Worker, on_delete=models.PROTECT, verbose_name='Работник')
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Работник')
     time_of_arrival = models.DateTimeField('Время прихода', default=timezone.now)
     time_of_leaving = models.DateTimeField('Время ухода', null=True)
     time_per_day = models.DecimalField('Время за день', null=True, max_digits=15, decimal_places=10)
+
+
+class Prize(models.Model):
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Работник')
+    sum_salary = models.DecimalField('Сумма премии', max_digits=15, decimal_places=2)
+    date_accruals = models.DateField('Дата начисления', default=timezone.now)
