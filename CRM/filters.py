@@ -27,3 +27,25 @@ class QualificationsFilter(django_filters.FilterSet):
     class Meta:
         model = models.Qualifiacation
         fields = ('name_qualification',)
+
+
+class Reports(django_filters.FilterSet):
+    worker = django_filters.ModelMultipleChoiceFilter(
+        label='Работники:',
+        field_name='username',
+        queryset=models.Worker.objects.filter(is_superuser=False),
+        widget=Select2MultipleWidget
+    )
+    qualification = django_filters.ModelMultipleChoiceFilter(
+        label='Должность:',
+        field_name='qualifiacation__name_qualification',
+        queryset=models.Qualifiacation.objects.all(),
+        widget=Select2MultipleWidget
+    )
+    status = django_filters.ModelMultipleChoiceFilter(
+        label='Статус:',
+        field_name='status__name_status',
+        queryset=models.Status.objects.all(),
+        widget=Select2MultipleWidget
+    )
+

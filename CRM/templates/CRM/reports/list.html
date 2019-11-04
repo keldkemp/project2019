@@ -1,0 +1,66 @@
+{% extends "CRM/bars/base.html" %}
+
+{% load bootstrap4 html_helper %}
+
+{% block nav %}
+{% endblock nav %}
+
+{% block content %}
+
+  <script language="javascript">
+    $(function () {
+      $("#clear-search").click(function (e) {
+        $('#' + $(this).data('search-id')).val('');
+        $(this).parents('form').submit();
+      });
+    });
+  </script>
+
+
+  <div class="ml-4 mt-4 mr-4 container-fluid">
+    <legend class="border-bottom mb-2">Отчет</legend>
+    <div style="background-color: #FFFFFF;" class="sticky-top">
+      <div class="row">
+        <div class="col-md-6">
+        <form class="form-inline mb-2">
+          <div class="ml-2">
+        {{ filter.form.worker.label }}
+       {% bootstrap_field filter.form.worker show_label=false %}
+        </div>
+            <div class="ml-2">
+        {{ filter.form.qualification.label }}
+       {% bootstrap_field filter.form.qualification show_label=false %}
+        </div>
+            <div class="ml-2">
+        {{ filter.form.status.label }}
+       {% bootstrap_field filter.form.status show_label=false %}
+        </div>
+              <input type="submit"
+                   value="Поиск" class="mt-4 ml-2 btn btn-success"/><br><br>
+          </form>
+        </div>
+      </div>
+    </div>
+
+      <table class="table table-sm table-bordered">
+           <tr>
+               <th scope="col"><b>ФИО</b></th>
+          <th scope="col"><b>Должность</b></th>
+               <th scope="col"><b>Статус</b></th>
+        </tr>
+        {%for user in workers%}
+
+
+
+        <tr>
+            <td> <div> <a href="{% url 'users:detail' user.id %}">{{ user.last_name }} {{ user.first_name }} {{ user.patronymic }}</a></div></td>
+         <td>{{ user.qualifiacation }}</td>
+            <td>{{ user.status }}</td>
+        </tr>
+
+  {%endfor%}
+      </table>
+
+      {% bootstrap_pagination page_obj extra=filter.data.urlencode %}
+  </div>
+{% endblock %}
