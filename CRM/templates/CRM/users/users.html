@@ -23,7 +23,7 @@
             Добавить сотрудника
           </a>
         {% endif %}
-        {% if user.is_manager_user and time == 3 or user.is_manager_user and time == 18 %}
+        {% if user.is_manager_user and time == 5 or user.is_manager_user and time == 20 %}
         <button class="btn btn-sm btn-success" type="submit" value="1" name="payment_money">Начать расчет Заработной платы</button>
         {% endif %}
         <p></p>

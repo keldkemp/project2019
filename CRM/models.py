@@ -134,6 +134,8 @@ class Worker(AbstractUser):
 
     def payment_money(self):
         users = Worker.objects.filter(is_superuser=False)
+        if Salary.objects.filter(date_accruals=datetime.date.today()).exists():
+            return False
         for user in users:
             time_for_user = Time.objects.filter(worker_id=user.id)
             all_time_in_month = 0
@@ -142,6 +144,25 @@ class Worker(AbstractUser):
             qualification = user.qualifiacation.money_index
             money = qualification * all_time_in_month
             Salary(worker_id=user.id, sum_salary=money).save()
+        return True
+
+    def give_prize(self, money):
+        data_start_const = 5
+        data_end_const = 20
+        star_data = datetime.date.today()
+        end_data = datetime.date.today()
+        if star_data.day >= data_end_const or star_data.day < 5:
+            star_data = datetime.date(star_data.year, star_data.month - 1, data_end_const)
+            end_data = datetime.date(end_data.year, end_data.month, data_start_const)
+        else:
+            star_data = datetime.date(star_data.year, star_data.month, data_end_const)
+            end_data = datetime.date(end_data.year, end_data.month + 1, data_start_const)
+        if Prize.objects.filter(date_accruals__range=(star_data, end_data), worker_id=self.id).exists():
+           prize = Prize.objects.get(worker_id=self.id, date_accruals__range=(star_data, end_data))
+           prize.sum_salary = prize.sum_salary + int(money)
+           prize.save()
+        else:
+            Prize(worker_id=self.id, sum_salary=money).save()
         return True
 
     def generate_username(self, first_name: str, last_name: str, patronymic: str) -> str:
@@ -170,13 +191,19 @@ class Worker(AbstractUser):
 
 
 class Salary(models.Model):
-    worker = models.ForeignKey(Worker, on_delete=models.PROTECT, verbose_name='Работник')
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Работник')
     sum_salary = models.DecimalField('Сумма денег за период', max_digits=15, decimal_places=2)
     date_accruals = models.DateField('Дата начисления', default=timezone.now)
 
 
 class Time(models.Model):
-    worker = models.ForeignKey(Worker, on_delete=models.PROTECT, verbose_name='Работник')
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Работник')
     time_of_arrival = models.DateTimeField('Время прихода', default=timezone.now)
     time_of_leaving = models.DateTimeField('Время ухода', null=True)
     time_per_day = models.DecimalField('Время за день', null=True, max_digits=15, decimal_places=10)
+
+
+class Prize(models.Model):
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Работник')
+    sum_salary = models.DecimalField('Сумма премии', max_digits=15, decimal_places=2)
+    date_accruals = models.DateField('Дата начисления', default=timezone.now)

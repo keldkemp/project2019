@@ -9,6 +9,8 @@
 
 
 <div class="container-fluid mt-4 ml-2 ">
+    <form method="POST">
+            {% csrf_token %}
     <legend class="mb-2">{{user_detail.last_name }} {{user_detail.first_name}} {{user_detail.patronymic}}</legend>
     <div class="row border-top mb-2">
       <div class="container-fluid mt-1">
@@ -34,6 +36,30 @@
             class="btn btn-sm btn-outline-danger"
             href="{% url 'users:delete' object.id %}"
           >Удалить</a>
+          {% endif %}
+          {% if user.is_manager and user.id != user_detail.id %}
+          <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#myModal">Премировать</button>
+
+          <!-- Модальное окно -->
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                          <h4 class="modal-title" id="myModalLabel">Премия</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                          <p>Сумма премии <input required type="number" name="money">
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                        <button class="btn btn-outline-info" type="submit" value="1" name="give_prize">Выдать премию</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
           {% endif %}
       </div>
     </div>
@@ -63,6 +89,23 @@
         </div>
     </div>
     {% if user.is_manager %}
+        {% if prize %}
+            <p></p>
+            <table class="table table-sm table-bordered">
+            <tr>
+                <th scope="col"><b>Дата начисления премии</b></th>
+                <th scope="col"><b>Премии</b></th>
+                </tr>
+            {% for prize in prize %}
+
+            <tr>
+                <td>{{ prize.date_accruals }}</td>
+                <td>{{ prize.sum_salary }} руб.</td>
+            </tr>
+
+            {% endfor %}
+             </table>
+        {% endif %}
     {% if money %}
     <p></p>
     <table class="table table-sm table-bordered">
@@ -102,6 +145,6 @@
       </table>
     {% bootstrap_pagination times extra=filter.data.urlencode %}
     {% endif %}{% endif %}
+    </form>
 </div>
-
 {% endblock content %}

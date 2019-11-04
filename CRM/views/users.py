@@ -12,7 +12,7 @@ from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 import datetime
-from CRM.models import Salary
+from CRM.models import Salary, Prize
 
 
 class ShowUsers(PermissionRequiredMixin, FilterView):
@@ -66,6 +66,7 @@ class DetailUsers (PermissionRequiredMixin, DetailView):
         context = super(DetailUsers, self).get_context_data(**kwargs)
         list_exam = Time.objects.filter(worker_id=context['user_detail'].id).order_by('-pk')
         money = Salary.objects.filter(worker_id=context['user_detail'].id).order_by('-pk')
+        prize = Prize.objects.filter(worker_id=context['user_detail'].id).order_by('-pk')
         paginator = Paginator(list_exam, self.paginate_by)
 
         page = self.request.GET.get('page')
@@ -79,7 +80,17 @@ class DetailUsers (PermissionRequiredMixin, DetailView):
 
         context['times'] = file_exams
         context['money'] = money
+        context['prize'] = prize
         return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            if request.POST['give_prize'] == '1':
+                self.object.give_prize(money=request.POST['money'])
+                return super().get(request, *args, **kwargs)
+        except:
+            return super().get(request, *args, **kwargs)
 
 
 class UpdateUsers(PermissionRequiredMixin, UpdateView):
