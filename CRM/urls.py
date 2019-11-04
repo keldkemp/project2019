@@ -1,6 +1,6 @@
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-from CRM.views import auth, users, qualifications
+from CRM.views import auth, users, qualifications, reports
 
 
 auth_urlpatterns = ([
@@ -41,10 +41,15 @@ qualifications_urlpatterns = ([
     path('<int:pk>/delete/', qualifications.DeleteQualifications.as_view(), name='delete'),
 ], 'qualifications')
 
+reports_urlpatterns = ([
+    path('', reports.List.as_view(), name='list'),
+], 'reports')
+
 urlpatterns = [
     path('', auth.CrmLoginRedirectView.as_view()),
     path('accounts/', include(auth_urlpatterns)),
     path('users/', include(users_urlpatterns)),
     path('qualifications/', include(qualifications_urlpatterns)),
+    path('reports/', include(reports_urlpatterns)),
 ]
 
