@@ -16,7 +16,7 @@ def connect(request):
 
     if user is not None:
         user_send = Worker.objects.filter(id=user.id).values("username")
-        time_send = Time.objects.filter(worker_id=user.id).values("time_of_arrival", "time_of_leaving")
+        time_send = Time.objects.filter(worker_id=user.id).values("time_of_arrival", "time_of_leaving").order_by('-pk')
         return JsonResponse({'user': list(user_send), 'time': list(time_send)})
     else:
         return
