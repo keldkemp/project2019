@@ -11,6 +11,7 @@ from CRM.forms import ProfileAdminForm, UserForm
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
+from django.contrib.auth import update_session_auth_hash
 
 
 class CrmLoginRedirectView(RedirectView):
@@ -42,7 +43,20 @@ class CrmLogoutView(LogoutView):
 
 class PasswordChangeFirsView(LoginRequiredMixin, PasswordChangeView):
     success_url = reverse_lazy('accounts:password-change-done')
-    template_name = 'CRM/auth/password-change.html'
+    template_name = 'CRM/auth/password-change-first.html'
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def post(self, request, *args, **kwargs):
+        self.object = request.user
+        if request.POST['password'] and request.POST['password_repeat']:
+            worker = Worker.objects.get(id=self.object.id)
+            worker.set_password(request.POST['password'])
+            worker.save()
+            worker.get_update_first_user_login()
+            update_session_auth_hash(request, worker)
+            return render(request, 'CRM/auth/password_change_done.html', context={'user': self.object})
 
 
 class PasswordChangeView(LoginRequiredMixin, PasswordChangeView):
