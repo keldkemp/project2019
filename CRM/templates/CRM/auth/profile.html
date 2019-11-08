@@ -42,13 +42,49 @@
       {% endif %}
       <div>Квалификация: {{ user.qualifiacation }}</div>
       <p></p>
+        <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#myModal">
+            Настроить
+        </button>
+                <!-- Модальное окно -->
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
 
 
-        <a
-          href="{% url 'accounts:password-change' %}"
-          class="btn btn-outline-danger"
-        >Настроить</a>
-        <p></p>
+
+                        <div class="modal-header">
+                          <h4 class="modal-title" id="myModalLabel">Настройка</h4>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+
+                        <div class="modal-body">
+                          {% bootstrap_field form.user.fullname %}
+                          {% bootstrap_field form.user.last_name %}
+                          {% bootstrap_field form.user.first_name %}
+                          {% bootstrap_field form.user.patronymic %}
+                          {% bootstrap_field form.user.email %}
+                          {% bootstrap_form form.detail show_help=False %}
+                        </div>
+
+                        <div class="modal-footer">
+                          <input type="submit" value="Сохранить" class="btn btn-success">
+                          {% if user.has_usable_password %}
+                          <a
+                              href="{% url 'accounts:password-change' %}"
+                              class="btn btn-outline-danger"
+                          >Сменить пароль</a>
+                          {% endif %}
+                        </div>
+
+
+
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
     </form>
       {% if prize %}
             <p></p>
