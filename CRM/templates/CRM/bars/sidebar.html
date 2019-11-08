@@ -1,55 +1,62 @@
 {% load static html_helper %}
 <!-- Для отступа style="margin-top: 8px;" -->
-<nav class="col-md-2 d-none d-md-block sidebar" id="sidebar">
+<nav style="width: 50px"  class="d-none d-md-block sidebar" id="sidebar">
   <div class="sidebar-sticky">
     <ul class="navbar-nav flex-column">
       {% if user.is_first_login %}
       <li class="nav-item">
-        <a
+        <div class="card transition">
+            <a style="color: #FFFFFF"
           class="nav-link"
           href="
             {% url 'accounts:profile' %}"
           name="Профиль"
         >
-          Профиль
+          &#10026; Профиль
         </a>
-
+        </div>
       </li>
+          <li>&emsp;</li>
       <li class="nav-item">
-        <a
+        <div class="card transition">
+          <a style="color: #FFFFFF"
           class="nav-link"
           href="
             {% url 'users:list' %}"
           name="Список работников"
         >
-          Список работников
+          &#10027; Список работников
         </a>
-
+        </div>
 
       </li>
+          <li>&emsp;</li>
       {% if user.is_manager %}
       <li class="nav-item">
-        <a
+        <div class="card transition">
+          <a style="color: #FFFFFF"
           class="nav-link"
           href="
             {% url 'qualifications:list' %}"
           name="Квалификации"
         >
-          Квалификации
+           &#10031; Квалификации
         </a>
-
+        </div>
 
       </li>
+          <li>&emsp;</li>
       <li class="nav-item">
-        <a
+        <div class="card transition">
+          <a style="color: #FFFFFF"
           class="nav-link"
           href="
             {% url 'reports:list' %}"
           name="Отчеты"
         >
-          Отчеты
+          &#10057; Отчеты
         </a>
-
+        </div>
 
       </li>
       {% endif %}

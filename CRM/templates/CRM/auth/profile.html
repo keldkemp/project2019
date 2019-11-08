@@ -28,30 +28,27 @@
 
 {% block content %}
   <div class="content-section ml-4 mt-4 w-50">
-    <legend class="border-bottom mb-2">Настройка профиля</legend>
+    <legend class="border-bottom mb-2">Профиль</legend>
     <form method="post">
 
       {% csrf_token %}
       <div>Логин: {{ user.username }}</div>
       <p></p>
+      <div>ФИО: {{ user.last_name }} {{ user.first_name }} {{ user.patronymic }}</div>
+      <p></p>
+      {% if user.email %}
+      <div>Email: {{ user.email }}</div>
+      <p></p>
+      {% endif %}
       <div>Квалификация: {{ user.qualifiacation }}</div>
       <p></p>
-      {% bootstrap_field form.user.fullname %}
-      {% bootstrap_field form.user.last_name %}
-      {% bootstrap_field form.user.first_name %}
-      {% bootstrap_field form.user.patronymic %}
-      {% bootstrap_field form.user.email %}
-      {% bootstrap_form form.detail show_help=False %}
 
-      <input type="submit" value="Сохранить" class="btn btn-success">
 
-      {% if user.has_usable_password %}
         <a
           href="{% url 'accounts:password-change' %}"
           class="btn btn-outline-danger"
-        >Сменить пароль</a>
-      {% endif %}
-
+        >Настроить</a>
+        <p></p>
     </form>
       {% if prize %}
             <p></p>
@@ -107,7 +104,9 @@
 
   {% endfor %}
       </table>
+
     {% bootstrap_pagination times extra=filter.data.urlencode %}
     {% endif %}
+
   </div>
 {% endblock %}
