@@ -16,6 +16,11 @@
             {% bootstrap_form form %}
             <div class="form-group">
                 <button class="btn btn-outline-info" type="submit">Изменить</button>
+            </div>
+        </form>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
                 {% if not object.is_command_status %}
                 <!-- Кнопка пуска модальное окно -->
                 <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#myModal">
@@ -34,6 +39,7 @@
                       </div>
                       <div class="modal-body">
                           <p>Дата с <input required type="date" name="start_mission"> Дата по <input required type="date" name="end_mission">
+                          <input type="hidden" name="qualifiacation" value="{{user_detail.qualifiacation.id}}">
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
