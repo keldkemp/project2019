@@ -40,6 +40,10 @@
       <div>Email: {{ user.email }}</div>
       <p></p>
       {% endif %}
+      {% if user.phone_number %}
+      <div>Номер телефона: {{ user.phone_number }}</div>
+      <p></p>
+      {% endif %}
       <div>Квалификация: {{ user.qualifiacation }}</div>
       <p></p>
         <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#myModal">
