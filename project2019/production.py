@@ -7,7 +7,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost', 
     '127.0.0.1', 
-    'crmproject2019designer.herokuapp.com',
+    'crmproject2019.herokuapp.com',
 ]
 
 # django-multitenant db engine for foreign keys is broken, use default
