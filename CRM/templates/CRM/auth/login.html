@@ -4,15 +4,21 @@
     <div class="container d-flex h-100">
         <div class="row align-self-center w-100">
             <form method="post" action="{% url 'accounts:login' %}"
-                  class="w-100">
+                  class="loginin">
                 <div class="col-6 mx-auto">
+                    <h3></h3>
+                    <h3>Авторизация</h3>
+                    <h3></h3>
+
                     {% csrf_token %}
                     {% bootstrap_form form show_label=False %}
 
-                    <input class="btn btn-success mb-3 w-100" type="submit" value="Войти">
+                    <input class="btn btn-success mb-3 w-110" type="submit" value="Войти">
 
                     <input type="hidden" name="next" value="{{ next }}">
+                <h3></h3>
                 </div>
+
             </form>
         </div>
     </div>

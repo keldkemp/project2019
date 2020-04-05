@@ -10,6 +10,24 @@ import pytz
 from decimal import Decimal
 
 
+class EtisUsers(models.Model):
+    name = models.CharField('ФИО', max_length=500)
+    username = models.CharField('Username Etis', max_length=500)
+    password = models.CharField('Password Etis', max_length=500)
+
+
+class EtisMakes(models.Model):
+    discipline = models.CharField('Дисциплина', max_length=500)
+    make = models.CharField('Оценка', max_length=150)
+    date = models.CharField('Дата', max_length=150)
+    teacher = models.CharField('Преподаватель', max_length=500)
+    trem = models.CharField('Триместр', max_length=500, null=True)
+    user = models.ForeignKey(EtisUsers, on_delete=models.CASCADE, verbose_name='Пользователь', null=True)
+
+    def update_makes(self):
+        EtisMakes(EtisMakes_id=self.id, discipline=self.discipline, make=self.make, date=self.date, teacher=self.teacher).save()
+
+
 class Status(models.Model):
     name_status = models.CharField('Статус работника', max_length=150)
 
