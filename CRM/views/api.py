@@ -69,14 +69,18 @@ def parse_session(html, user):
 
 
 @csrf_exempt
-def etis(request):
+def update_session(request):
     try:
         username = request.POST['username']
-        user = EtisUsers.objects.get(username=username)
+        name = request.POST['name']
+        user = EtisUsers.objects.get(username=username, name=name)
 
         html = get_html('https://student.psu.ru/pls/stu_cus_et/stu.signs?p_mode=session', username=user.username, password=user.password)
         parse_session(html.text, user)
-        return HttpResponse(status=200)
+
+        makes = EtisMakes.objects.filter(user_id=user.id).values('discipline', 'make', 'date', 'teacher',
+                                                                 'trem').order_by('id')
+        return JsonResponse({'makes': list(makes)})
     except:
         return HttpResponse(status=404)
 
@@ -101,8 +105,11 @@ def add_user_etis(request):
         username = request.POST['username']
         password = request.POST['password']
 
-        if EtisUsers.objects.filter(username=username):
-            user = EtisUsers.objects.filter(username=username).values('name', 'id')
+        if EtisUsers.objects.filter(username=username, password=password):
+            user = EtisUsers.objects.filter(username=username, password=password).values('name', 'id')
+            user_pas = EtisUsers.objects.get(username=username, password=password)
+            user_pas.password = password
+            user_pas.save()
             makes = EtisMakes.objects.filter(user_id=user[0]['id']).values('discipline', 'make', 'date', 'teacher', 'trem').order_by('id')
         else:
             name = get_name_etis(username, password)
@@ -112,7 +119,7 @@ def add_user_etis(request):
             else:
                 user = EtisUsers.objects.filter().order_by('-id')
                 EtisUsers(id=user[0].id+1, username=username, password=password, name=name).save()
-            user = EtisUsers.objects.get(username=username)
+            user = EtisUsers.objects.get(username=username, password=password)
             add_fist_makes(user)
             makes = EtisMakes.objects.filter(user_id=user.id).values('discipline', 'make', 'date', 'teacher', 'trem').order_by('id')
 

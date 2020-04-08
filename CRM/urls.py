@@ -47,7 +47,7 @@ reports_urlpatterns = ([
 
 api_urlpatterns = ([
     path('', api.connect),
-    path('etis/', api.etis),
+    path('etis/updatesession', api.update_session),
     path('etis/adduser', api.add_user_etis),
 ], 'api')
 
