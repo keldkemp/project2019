@@ -82,14 +82,17 @@ def parse_session(html, user):
 
 @csrf_exempt
 def update_password(request):
-    username = request.POST['username']
-    old_password = request.POST['old_password']
-    new_password = request.POST['new_password']
+    try:
+        username = request.POST['username']
+        old_password = request.POST['old_password']
+        new_password = request.POST['new_password']
+    except:
+        return HttpResponse(status=401)  # Одно из полей не заполнено
 
     try:
         user = EtisUsers.objects.get(username=username, password=old_password)
     except:
-        return HttpResponse(status=403)
+        return HttpResponse(status=403)  # Введен неверный пароль
 
     try:
 
@@ -109,7 +112,7 @@ def update_password(request):
         try:
             btm_change = browser.find_element_by_link_text('Смена пароля')
         except:
-            return HttpResponse(status=403)
+            return HttpResponse(status=403)  # Введен неверный пароль
         btm_change.click()
 
         p_old_password = browser.find_element_by_id('old')
@@ -124,15 +127,21 @@ def update_password(request):
         try:
             btm = browser.find_element_by_class_name('button_gray')
         except:
-            return HttpResponse(status=402)
+            return HttpResponse(status=402)  # В данный момент пароль изменить нельзя
         btm.click()
+
+        try:
+            error = browser.find_element_by_class_name('error')
+            return HttpResponse(status=402)  # В данный момент пароль изменить нельзя
+        except:
+            pass
 
         user.password = new_password
         user.save()
 
         return HttpResponse(status=200)
     except:
-        HttpResponse(status=404)
+        HttpResponse(status=404)  # Неизвестная ошибка
 
 
 @csrf_exempt
