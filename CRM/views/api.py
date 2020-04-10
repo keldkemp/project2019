@@ -18,12 +18,10 @@ import os
 BASE_URL_LOGIN = 'https://student.psu.ru/pls/stu_cus_et/stu.login'
 
 opts = webdriver.ChromeOptions()
-opts.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+#opts.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
 opts.add_argument('--headless')
 opts.add_argument('--dasable-dev-shm-usage')
 opts.add_argument('--no-sandbox')
-browser = webdriver.Chrome(chrome_options=opts, executable_path=os.environ.get("CHROMEDRIVER_PATH"))
-#browser = webdriver.Chrome(chrome_options=opts, executable_path="C:/Users/keldkemp/Desktop/chromedriver.exe")
 
 
 @csrf_exempt
@@ -82,6 +80,13 @@ def parse_session(html, user):
 
 @csrf_exempt
 def update_password(request):
+
+    try:
+        browser = webdriver.Chrome(chrome_options=opts, executable_path=os.environ.get("CHROMEDRIVER_PATH"))
+        #browser = webdriver.Chrome(chrome_options=opts, executable_path="C:/Users/keldkemp/Desktop/chromedriver.exe")
+    except:
+        return HttpResponse(status=404)
+
     try:
         username = request.POST['username']
         old_password = request.POST['old_password']
@@ -138,6 +143,8 @@ def update_password(request):
 
         user.password = new_password
         user.save()
+
+        browser.close()
 
         return HttpResponse(status=200)
     except:
