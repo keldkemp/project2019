@@ -49,6 +49,7 @@ api_urlpatterns = ([
     path('', api.connect),
     path('etis/updatesession', api.update_session),
     path('etis/adduser', api.add_user_etis),
+    path('etis/updatepassword', api.update_password),
 ], 'api')
 
 urlpatterns = [
