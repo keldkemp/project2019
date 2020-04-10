@@ -23,6 +23,7 @@ opts.add_argument('--headless')
 opts.add_argument('--dasable-dev-shm-usage')
 opts.add_argument('--no-sandbox')
 browser = webdriver.Chrome(chrome_options=opts, executable_path=os.environ.get("CHROMEDRIVER_PATH"))
+#browser = webdriver.Chrome(chrome_options=opts, executable_path="C:/Users/keldkemp/Desktop/chromedriver.exe")
 
 
 @csrf_exempt
@@ -85,7 +86,10 @@ def update_password(request):
     old_password = request.POST['old_password']
     new_password = request.POST['new_password']
 
-    user = EtisUsers.objects.get(username=username, password=old_password)
+    try:
+        user = EtisUsers.objects.get(username=username, password=old_password)
+    except:
+        return HttpResponse(status=403)
 
     try:
 
@@ -100,9 +104,12 @@ def update_password(request):
         btm = browser.find_element_by_id('sbmt')
         btm.click()
 
-        time.sleep(5)
+        time.sleep(3)
 
-        btm_change = browser.find_element_by_link_text('Смена пароля')
+        try:
+            btm_change = browser.find_element_by_link_text('Смена пароля')
+        except:
+            return HttpResponse(status=403)
         btm_change.click()
 
         p_old_password = browser.find_element_by_id('old')
@@ -114,7 +121,10 @@ def update_password(request):
         p_confirm_password = browser.find_element_by_id('confirm')
         p_confirm_password.send_keys(new_password)
 
-        btm = browser.find_element_by_class_name('button_gray')
+        try:
+            btm = browser.find_element_by_class_name('button_gray')
+        except:
+            return HttpResponse(status=402)
         btm.click()
 
         user.password = new_password
