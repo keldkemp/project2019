@@ -115,6 +115,9 @@ def update_password(request):
         btm = browser.find_element_by_class_name('button_gray')
         btm.click()
 
+        user.password = new_password
+        user.save()
+
         return HttpResponse(status=200)
     except:
         HttpResponse(status=404)
