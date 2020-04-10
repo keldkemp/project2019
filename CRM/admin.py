@@ -44,6 +44,7 @@ class SalaryAdmin(admin.ModelAdmin):
 class SalaryAdmin(admin.ModelAdmin):
     list_display = ('worker', 'time_of_arrival', 'time_of_leaving', 'time_per_day')
 
+
 @admin.register(models.EtisUsers)
 class EtisUsersAdmin(admin.ModelAdmin):
-    list_display = ('name', 'Username', 'Password' )
+    list_display = ('name', 'username', 'password')
