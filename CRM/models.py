@@ -13,7 +13,8 @@ from decimal import Decimal
 class EtisUsers(models.Model):
     name = models.CharField('ФИО', max_length=500)
     username = models.CharField('Username Etis', max_length=500)
-    password = models.CharField('Password Etis', max_length=500)
+    password = models.CharField('Password Etis', max_length=500, null=True)
+    api_key = models.CharField('Api key for Android', max_length=500, null=True)
 
 
 class EtisMakes(models.Model):

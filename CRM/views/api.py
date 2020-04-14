@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import make_password, check_password
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from CRM.models import Worker, Time
@@ -13,9 +14,12 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from CRM.models import EtisMakes, EtisUsers
 import time
 import os
+import random
+import string
 
 
 BASE_URL_LOGIN = 'https://student.psu.ru/pls/stu_cus_et/stu.login'
+BASE_URL_CHANGE_PASSWORD = 'https://student.psu.ru/pls/stu_cus_et/stu.change_pass_form'
 
 opts = webdriver.ChromeOptions()
 #opts.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
@@ -40,6 +44,41 @@ def connect(request):
             return HttpResponse(status=404)
     except:
         return HttpResponse(status=404)
+
+
+# API ETIS
+
+
+def get_html_from_cookie(url, cookie):
+    session = requests.session()
+    response = session.post(url, cookies=cookie)
+
+    return response
+
+
+@csrf_exempt
+def get_new_cookie(request):
+    try:
+        username = request.POST['username']
+        password = request.POST['password']
+
+        cookie = get_cookie(username=username, password=password)
+
+        if len(cookie) == 0:
+            return HttpResponse(status=403)  # Неверный пароль
+
+        return JsonResponse({'cookie': list(cookie)})
+    except:
+        return HttpResponse(status=404)
+
+
+def get_cookie(username, password):
+    session = requests.session()
+    data = {'p_username': username.encode('windows-1251'), 'p_password': password}
+    r = session.post(BASE_URL_LOGIN, data=data)
+    cookie = r.cookies.get_dict()
+
+    return cookie
 
 
 def get_html(url, username, password):
@@ -80,22 +119,22 @@ def parse_session(html, user):
 
 @csrf_exempt
 def update_password(request):
-
     try:
         browser = webdriver.Chrome(chrome_options=opts, executable_path=os.environ.get("CHROMEDRIVER_PATH"))
-        #browser = webdriver.Chrome(chrome_options=opts, executable_path="C:/Users/keldkemp/Desktop/chromedriver.exe")
+        # browser = webdriver.Chrome(chrome_options=opts, executable_path="C:/Users/keldkemp/Desktop/chromedriver.exe")
     except:
         return HttpResponse(status=404)
 
     try:
         username = request.POST['username']
+        name = request.POST['name']
         old_password = request.POST['old_password']
         new_password = request.POST['new_password']
     except:
         return HttpResponse(status=401)  # Одно из полей не заполнено
 
     try:
-        user = EtisUsers.objects.get(username=username, password=old_password)
+        user = EtisUsers.objects.get(username=username, name=name)
     except:
         return HttpResponse(status=403)  # Введен неверный пароль
 
@@ -141,9 +180,6 @@ def update_password(request):
         except:
             pass
 
-        user.password = new_password
-        user.save()
-
         browser.close()
 
         return HttpResponse(status=200)
@@ -154,11 +190,12 @@ def update_password(request):
 @csrf_exempt
 def update_session(request):
     try:
-        username = request.POST['username']
+        cookie = request.POST['cookie']
+        cookie = {'session_id': cookie}
         name = request.POST['name']
-        user = EtisUsers.objects.get(username=username, name=name)
+        user = EtisUsers.objects.get(name=name)
 
-        html = get_html('https://student.psu.ru/pls/stu_cus_et/stu.signs?p_mode=session', username=user.username, password=user.password)
+        html = get_html_from_cookie('https://student.psu.ru/pls/stu_cus_et/stu.signs?p_mode=session', cookie=cookie)
         parse_session(html.text, user)
 
         makes = EtisMakes.objects.filter(user_id=user.id).values('discipline', 'make', 'date', 'teacher',
@@ -168,8 +205,8 @@ def update_session(request):
         return HttpResponse(status=404)
 
 
-def add_fist_makes(user):
-    html = get_html('https://student.psu.ru/pls/stu_cus_et/stu.signs?p_mode=session', username=user.username, password=user.password)
+def add_fist_makes(cookie, user):
+    html = get_html_from_cookie('https://student.psu.ru/pls/stu_cus_et/stu.signs?p_mode=session', cookie=cookie)
     parse_session(html.text, user)
 
 
@@ -182,30 +219,36 @@ def get_name_etis(username, password):
     return name
 
 
+def generate_key():
+    str = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(30))
+    key = make_password(str)
+    return key
+
+
 @csrf_exempt
 def add_user_etis(request):
     try:
         username = request.POST['username']
         password = request.POST['password']
 
-        if EtisUsers.objects.filter(username=username, password=password):
-            user = EtisUsers.objects.filter(username=username, password=password).values('name', 'id')
-            user_pas = EtisUsers.objects.get(username=username, password=password)
-            user_pas.password = password
-            user_pas.save()
+        name = get_name_etis(username, password)
+        cookie = get_cookie(username, password)
+
+        if EtisUsers.objects.filter(username=username, name=name):
+            user = EtisUsers.objects.filter(username=username, name=name).values('name', 'id')
             makes = EtisMakes.objects.filter(user_id=user[0]['id']).values('discipline', 'make', 'date', 'teacher', 'trem').order_by('id')
         else:
-            name = get_name_etis(username, password)
-
             if not EtisUsers.objects.filter(id=1).exists():
-                EtisUsers(id=1, username=username, password=password, name=name).save()
+                EtisUsers(id=1, username=username, name=name).save()
             else:
                 user = EtisUsers.objects.filter().order_by('-id')
-                EtisUsers(id=user[0].id+1, username=username, password=password, name=name).save()
-            user = EtisUsers.objects.get(username=username, password=password)
-            add_fist_makes(user)
+                EtisUsers(id=user[0].id+1, username=username, name=name).save()
+            user = EtisUsers.objects.get(username=username, name=name)
+            add_fist_makes(cookie, user)
             makes = EtisMakes.objects.filter(user_id=user.id).values('discipline', 'make', 'date', 'teacher', 'trem').order_by('id')
 
-        return JsonResponse({'user': list(user), 'makes': list(makes)})
+            user = EtisUsers.objects.filter(username=username, name=name).values('name', 'id')
+
+        return JsonResponse({'user': list(user), 'makes': list(makes), 'cookie': cookie})
     except:
         return HttpResponse(status=404)
