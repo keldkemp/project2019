@@ -22,7 +22,7 @@ BASE_URL_LOGIN = 'https://student.psu.ru/pls/stu_cus_et/stu.login'
 BASE_URL_CHANGE_PASSWORD = 'https://student.psu.ru/pls/stu_cus_et/stu.change_pass_form'
 
 opts = webdriver.ChromeOptions()
-#opts.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+opts.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
 opts.add_argument('--headless')
 opts.add_argument('--dasable-dev-shm-usage')
 opts.add_argument('--no-sandbox')
