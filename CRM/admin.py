@@ -47,4 +47,4 @@ class SalaryAdmin(admin.ModelAdmin):
 
 @admin.register(models.EtisUsers)
 class EtisUsersAdmin(admin.ModelAdmin):
-    list_display = ('name', 'username', 'password')
+    list_display = ('name', 'username', 'password', 'api_key')
