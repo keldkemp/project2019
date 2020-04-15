@@ -67,7 +67,7 @@ def get_new_cookie(request):
         if len(cookie) == 0:
             return HttpResponse(status=403)  # Неверный пароль
 
-        return JsonResponse({'cookie': list(cookie)})
+        return JsonResponse({'cookie': cookie})
     except:
         return HttpResponse(status=404)
 
