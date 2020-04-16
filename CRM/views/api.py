@@ -14,7 +14,6 @@ import random
 import string
 import threading
 import re
-import datetime
 
 
 BASE_URL_LOGIN = 'https://student.psu.ru/pls/stu_cus_et/stu.login'
@@ -51,7 +50,6 @@ def connect(request):
 # Получения оценок во Всех Триместрах. По-идее, должен вызываться только один раз
 @csrf_exempt
 def get_makes_in_all_trem(request):
-    start = datetime.datetime.now()
     name = request.POST['name']
 
     user = EtisUsers.objects.get(name=name)
@@ -63,9 +61,7 @@ def get_makes_in_all_trem(request):
                                                                            'type_of_control', 'make', 'passing_score',
                                                                            'max_score', 'date', 'teacher',
                                                                            'trem').order_by('id')
-    end = datetime.datetime.now()
 
-    print(start, ' ', end)
     return JsonResponse({'makes': list(makes_list)})
 
 
