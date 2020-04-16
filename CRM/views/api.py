@@ -21,7 +21,7 @@ BASE_URL_CHANGE_PASSWORD = 'https://student.psu.ru/pls/stu_cus_et/stu.change_pas
 BASE_URL_MAKES_IN_TREM = 'https://student.psu.ru/pls/stu_cus_et/stu.signs?p_mode=current&p_term='
 
 opts = webdriver.ChromeOptions()
-opts.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+#opts.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
 opts.add_argument('--headless')
 opts.add_argument('--dasable-dev-shm-usage')
 opts.add_argument('--no-sandbox')
@@ -53,10 +53,17 @@ def get_makes_in_all_trem(request):
     name = request.POST['name']
 
     user = EtisUsers.objects.get(name=name)
+    i = 0
+
+    while i < 150:
+        time.sleep(1)
+        if user.is_all_makes():
+            break
+        user = EtisUsers.objects.get(name=name)
+        i += 1
 
     if not user.is_all_makes():
-        time.sleep(1)
-
+        return HttpResponse(status=402)
     makes_list = EtisMakesInTrem.objects.filter(user_id=user.id).values('discipline', 'tema', 'type_of_work',
                                                                            'type_of_control', 'make', 'passing_score',
                                                                            'max_score', 'date', 'teacher',
