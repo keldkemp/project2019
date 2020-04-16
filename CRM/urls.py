@@ -51,6 +51,8 @@ api_urlpatterns = ([
     path('etis/adduser', api.add_user_etis),
     path('etis/updatepassword', api.update_password),
     path('etis/updatecookie', api.get_new_cookie),
+    path('etis/updatemakesintrem', api.update_makes_in_trem),
+    path('etis/getmakesintrem', api.get_makes_in_all_trem),
 ], 'api')
 
 urlpatterns = [
