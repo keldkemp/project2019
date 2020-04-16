@@ -15,6 +15,10 @@ class EtisUsers(models.Model):
     username = models.CharField('Username Etis', max_length=500)
     password = models.CharField('Password Etis', max_length=500, null=True)
     api_key = models.CharField('Api key for Android', max_length=500, null=True)
+    is_all_makes_in_trem = models.BooleanField('Проверка на поток', default=False)
+
+    def is_all_makes(self):
+        return self.is_all_makes_in_trem
 
 
 class EtisMakes(models.Model):
@@ -27,6 +31,20 @@ class EtisMakes(models.Model):
 
     def update_makes(self):
         EtisMakes(EtisMakes_id=self.id, discipline=self.discipline, make=self.make, date=self.date, teacher=self.teacher).save()
+
+
+class EtisMakesInTrem(models.Model):
+    discipline = models.CharField('Дисциплина', max_length=500)
+    tema = models.CharField('Тема', max_length=500)
+    type_of_work = models.CharField('Вид работы', max_length=500)
+    type_of_control = models.CharField('Вид контроля', max_length=500)
+    make = models.CharField('Оценка', max_length=500, null=True)
+    passing_score = models.CharField('Проходной балл', max_length=500)
+    max_score = models.CharField('Максимальный балл', max_length=500)
+    date = models.CharField('Дата', max_length=500, null=True)
+    teacher = models.CharField('Преподаватель', max_length=500, null=True)
+    trem = models.CharField('Триместр', max_length=500)
+    user = models.ForeignKey(EtisUsers, on_delete=models.CASCADE, verbose_name='Пользователь', null=True)
 
 
 class Status(models.Model):

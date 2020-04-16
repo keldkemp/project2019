@@ -4,22 +4,21 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from CRM.models import Worker, Time
-from django.http import HttpResponse
 import requests
-import re
 from bs4 import BeautifulSoup
-import json
 from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from CRM.models import EtisMakes, EtisUsers
+from CRM.models import EtisMakes, EtisUsers, EtisMakesInTrem
 import time
 import os
 import random
 import string
+import threading
+import re
 
 
 BASE_URL_LOGIN = 'https://student.psu.ru/pls/stu_cus_et/stu.login'
 BASE_URL_CHANGE_PASSWORD = 'https://student.psu.ru/pls/stu_cus_et/stu.change_pass_form'
+BASE_URL_MAKES_IN_TREM = 'https://student.psu.ru/pls/stu_cus_et/stu.signs?p_mode=current&p_term='
 
 opts = webdriver.ChromeOptions()
 opts.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
@@ -48,7 +47,169 @@ def connect(request):
 
 # API ETIS
 
+# Получения оценок во Всех Триместрах. По-идее, должен вызываться только один раз
+@csrf_exempt
+def get_makes_in_all_trem(request):
+    name = request.POST['name']
 
+    user = EtisUsers.objects.get(name=name)
+
+    if not user.is_all_makes():
+        time.sleep(1)
+
+    makes_list = EtisMakesInTrem.objects.filter(user_id=user.id).values('discipline', 'tema', 'type_of_work',
+                                                                           'type_of_control', 'make', 'passing_score',
+                                                                           'max_score', 'date', 'teacher',
+                                                                           'trem').order_by('id')
+
+    return JsonResponse({'makes': list(makes_list)})
+
+
+# Обновление оценок в Текущем Триместре
+@csrf_exempt
+def update_makes_in_trem(request):
+    try:
+        cookie = request.POST['cookie']
+        cookie = {'session_id': cookie}
+        name = request.POST['name']
+
+        trem = get_current_trem(cookie)
+        html = get_html_from_cookie(BASE_URL_MAKES_IN_TREM, cookie)
+
+        user = EtisUsers.objects.get(name=name)
+        pars_makes_in_trem(html, user, trem)
+
+        makes_in_trem = EtisMakesInTrem.objects.filter(user_id=user.id, trem=trem).values('discipline', 'tema',
+                                                                                          'type_of_work', 'type_of_control',
+                                                                                          'make', 'passing_score',
+                                                                                          'max_score', 'date', 'teacher',
+                                                                                          'trem').order_by('id')
+
+        return JsonResponse({'make': list(makes_in_trem)})
+    except:
+        return HttpResponse(status=400)
+
+
+# Получение текущего триместра
+def get_current_trem(cookie):
+    html = get_html_from_cookie('https://student.psu.ru/pls/stu_cus_et/stu.signs?p_mode=current', cookie)
+
+    soup = BeautifulSoup(html.text, 'lxml')
+    table = soup.find('div', class_='submenu')
+    table = table.findNext('div')
+    table = table.find_all('span')
+    trem = ''
+
+    for span in table:
+        if (span.find('a', class_='dashed')):
+            continue
+        trem = span.text
+        break
+
+    trem = trem.split('\n')
+
+    for tr in trem:
+        kek = tr.find('триместр')
+        if tr.find('триместр') != -1:
+            trem = tr
+            break
+
+
+    return trem
+
+
+# Занесение в БД информации по оценкам ВО Всех Триместрах
+def pars_makes_in_trem_first(html, user, trem):
+    soup = BeautifulSoup(html.text, 'lxml')
+    table = soup.find('div', class_='span9')
+
+    makes = {}
+    table_common = table.find('table', class_='common')
+
+    if table_common is None:
+        return
+
+    table = table.find_all('h3')
+    i = 0
+
+    if EtisMakesInTrem.objects.all():
+        id = EtisMakesInTrem.objects.filter().order_by('-id')[0].id + 1
+    else:
+        id = 0
+
+    for discipline_in_table in table:
+        discipline = discipline_in_table.text
+        for make in enumerate(table_common.find_all('td')):
+            if (len(makes) == 9):
+                EtisMakesInTrem(id=id, discipline=discipline, tema=makes[0], type_of_work=makes[1],
+                                type_of_control=makes[2], make=makes[3], passing_score=makes[4], max_score=makes[6],
+                                date=makes[7], teacher=makes[8], trem=str(str(trem) + ' триместр'),
+                                user_id=user.id).save()
+
+                makes = {}
+                i = 0
+                id = id + 1
+            makes[i] = make[1].text
+            i = i + 1
+        makes = {}
+        i = 0
+        table_common = table_common.findNext('table')
+
+
+# Обновление оценок Во Всех триместрах, Запускать именно этот метод!!!
+def pars_makes_in_trems_first(cookie, user):
+    trem_max_str = get_current_trem(cookie)
+    trem_max = int(re.findall('(\d+)', trem_max_str)[0]) + 1
+
+    if EtisMakesInTrem.objects.filter(user_id=user.id):
+        EtisMakesInTrem.objects.filter(user_id=user.id).delete()
+
+    for trem_min in range(1, trem_max):
+        url = BASE_URL_MAKES_IN_TREM + str(trem_min)
+        html = get_html_from_cookie(url, cookie)
+        pars_makes_in_trem_first(html, user, trem_min)
+
+    user.is_all_makes_in_trem = True
+    user.save()
+
+
+# Обновление оценок в Текущем Триместре
+def pars_makes_in_trem(html, user, trem):
+    soup = BeautifulSoup(html.text, 'lxml')
+    table = soup.find('div', class_='span9')
+
+    makes = {}
+    table_common = table.find('table', class_='common')
+    table = table.find_all('h3')
+    i = 0
+
+    if EtisMakesInTrem.objects.filter(user_id=user.id, trem=trem):
+        EtisMakesInTrem.objects.filter(user_id=user.id, trem=trem).delete()
+
+    if EtisMakesInTrem.objects.all():
+        id = EtisMakesInTrem.objects.filter().order_by('-id')[0].id + 1
+    else:
+        id = 0
+
+    for discipline_in_table in table:
+        discipline = discipline_in_table.text
+        for make in enumerate(table_common.find_all('td')):
+            if (len(makes) == 9):
+                EtisMakesInTrem(id=id, discipline=discipline, tema=makes[0], type_of_work=makes[1],
+                                type_of_control=makes[2], make=makes[3], passing_score=makes[4], max_score=makes[6],
+                                date=makes[7], teacher=makes[8], trem=trem,
+                                user_id=user.id).save()
+                makes = {}
+                i = 0
+                id = id + 1
+            makes[i] = make[1].text
+            i = i + 1
+        makes = {}
+        i = 0
+        table_common = table_common.findNext('table')
+
+
+# Получение страницы по Куки
 def get_html_from_cookie(url, cookie):
     session = requests.session()
     response = session.post(url, cookies=cookie)
@@ -56,6 +217,7 @@ def get_html_from_cookie(url, cookie):
     return response
 
 
+# Получение новой Сессии
 @csrf_exempt
 def get_new_cookie(request):
     try:
@@ -72,6 +234,7 @@ def get_new_cookie(request):
         return HttpResponse(status=404)
 
 
+# Получение Сесси при первом заходе
 def get_cookie(username, password):
     session = requests.session()
     data = {'p_username': username.encode('windows-1251'), 'p_password': password}
@@ -81,6 +244,7 @@ def get_cookie(username, password):
     return cookie
 
 
+# Получение страницы по Логину и Паролю
 def get_html(url, username, password):
     session = requests.session()
     data = {'p_username': username.encode('windows-1251'), 'p_password': password}
@@ -92,6 +256,7 @@ def get_html(url, username, password):
     return response
 
 
+# Занесение информации по Оценка за Сесию
 def parse_session(html, user):
     soup = BeautifulSoup(html, 'lxml')
     table = soup.find('table', class_='common')
@@ -117,6 +282,7 @@ def parse_session(html, user):
             makes = {}
 
 
+# Смена пароля в ЕТИС
 @csrf_exempt
 def update_password(request):
     try:
@@ -187,6 +353,7 @@ def update_password(request):
         HttpResponse(status=404)  # Неизвестная ошибка
 
 
+# Обновление Оценок за Сесию
 @csrf_exempt
 def update_session(request):
     try:
@@ -205,11 +372,14 @@ def update_session(request):
         return HttpResponse(status=404)
 
 
+# Функция вызывается при первой Авторизации в ЕТИС
 def add_fist_makes(cookie, user):
     html = get_html_from_cookie('https://student.psu.ru/pls/stu_cus_et/stu.signs?p_mode=session', cookie=cookie)
+    threading.Thread(target=pars_makes_in_trems_first, args=(cookie, user)).start()
     parse_session(html.text, user)
 
 
+# Получение ФИО в ЕТИС
 def get_name_etis(username, password):
     html = get_html('https://student.psu.ru/pls/stu_cus_et/stu.signs?p_mode=session', username=username, password=password)
 
@@ -219,12 +389,14 @@ def get_name_etis(username, password):
     return name
 
 
+# Генератор Ключа, Пока не используется
 def generate_key():
     str = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(30))
     key = make_password(str)
     return key
 
 
+# Авторизация Пользователя
 @csrf_exempt
 def add_user_etis(request):
     try:
