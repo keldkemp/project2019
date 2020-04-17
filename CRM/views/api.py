@@ -403,7 +403,7 @@ def generate_key():
 @csrf_exempt
 def add_user_etis(request):
     try:
-        username = request.POST['username']
+        username = request.POST['username'].title()
         password = request.POST['password']
 
         name = get_name_etis(username, password)
