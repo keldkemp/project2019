@@ -164,6 +164,8 @@ def pars_makes_in_trems_first(cookie, user):
     trem_max_str = get_current_trem(cookie)
     trem_max = int(re.findall('(\d+)', trem_max_str)[0]) + 1
 
+    time.sleep(3)
+
     if EtisMakesInTrem.objects.filter(user_id=user.id):
         EtisMakesInTrem.objects.filter(user_id=user.id).delete()
 
