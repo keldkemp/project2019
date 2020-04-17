@@ -55,10 +55,8 @@ def get_makes_in_all_trem(request):
     user = EtisUsers.objects.get(name=name)
 
     if not user.is_all_makes():
-        time.sleep(1)
-        user = EtisUsers.objects.get(name=name)
-        if not user.is_all_makes():
-            return HttpResponse(status=402)
+        time.sleep(2)
+        return HttpResponse(status=402)
 
     makes_list = EtisMakesInTrem.objects.filter(user_id=user.id).values('discipline', 'tema', 'type_of_work',
                                                                            'type_of_control', 'make', 'passing_score',
@@ -163,6 +161,8 @@ def pars_makes_in_trem_first(html, user, trem):
 def pars_makes_in_trems_first(cookie, user):
     trem_max_str = get_current_trem(cookie)
     trem_max = int(re.findall('(\d+)', trem_max_str)[0]) + 1
+
+    time.sleep(3)
 
     if EtisMakesInTrem.objects.filter(user_id=user.id):
         EtisMakesInTrem.objects.filter(user_id=user.id).delete()
