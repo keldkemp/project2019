@@ -55,10 +55,8 @@ def get_makes_in_all_trem(request):
     user = EtisUsers.objects.get(name=name)
 
     if not user.is_all_makes():
-        time.sleep(1)
-        user = EtisUsers.objects.get(name=name)
-        if not user.is_all_makes():
-            return HttpResponse(status=402)
+        time.sleep(2)
+        return HttpResponse(status=402)
 
     makes_list = EtisMakesInTrem.objects.filter(user_id=user.id).values('discipline', 'tema', 'type_of_work',
                                                                            'type_of_control', 'make', 'passing_score',
