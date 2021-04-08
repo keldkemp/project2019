@@ -6,7 +6,7 @@ django-heroku==0.3.1
 django-phonenumber-field==2.2.0
 django-betterforms==1.2
 django-select2==7.0.3
-Django==2.2.5
+Django==2.2.20
 pytz==2019.2
 rules==2.0.1
 gunicorn==19.9.0
